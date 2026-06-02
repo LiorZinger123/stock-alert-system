@@ -1,0 +1,3 @@
+consumer change status after sending mail
+current price 0.0 if no redis - needs to check, maybe another worker to update db price
+what to do with update/delete not on active
