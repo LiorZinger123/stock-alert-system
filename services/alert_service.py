@@ -1,10 +1,12 @@
 import logging
 import yfinance as yf
 from sqlalchemy import select
+from fastapi import HTTPException
 from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.models import Alert, Asset
 from .container import market_cache
+from helpers.enums import AlertStatus
 
 
 logger = logging.getLogger(__name__)
@@ -13,6 +15,13 @@ logger = logging.getLogger(__name__)
 class AlertService:
     def __init__(self, db: AsyncSession):
         self.db = db
+
+    def validate_alert_update(self, alert: Alert):
+        if alert.status == AlertStatus.SENT:
+            raise HTTPException(status_code=403, detail=f"Alert {alert.id} is already sent and cannot be modified.")
+        
+        if alert.status == AlertStatus.PENDING:
+            raise HTTPException(status_code=409, detail=f"Alert {alert.id} is in process.")
 
     async def get_all_by_user(self, user_id: int):
         query = select(Alert).options(joinedload(Alert.asset)).where(Alert.user_id == user_id)
@@ -96,10 +105,12 @@ class AlertService:
             alerts_map = {alert.id: alert for alert in result.scalars().all()}
 
             for item in updates:
-                if item.id not in alerts_map:
+                alert = alerts_map.get(item.id)
+                if not alert:
                     raise PermissionError(f"Alert {item.id} not found or unauthorized.")
+                
+                self.validate_alert_update(alert, item.dict(exclude={'id'}, exclude_unset=True))
 
-                alert = alerts_map[item.id]
                 update_data = item.dict(exclude={'id'}, exclude_unset=True)
                 for key, value in update_data.items():
                     setattr(alert, key, value)
@@ -127,6 +138,7 @@ class AlertService:
                 return 0
 
             for alert in alerts_to_delete:
+                self.validate_alert_action(alert, "delete")
                 await self.db.delete(alert)
             
             await self.db.commit()

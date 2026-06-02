@@ -1,8 +1,9 @@
 from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator, Field
 from .assets import AssetSchema
 from helpers.enums import ConditionEnum, AlertStatus
+from helpers.validators import round_price_helper
 
 
 class AlertReadSchema(BaseModel):
@@ -18,19 +19,18 @@ class AlertReadSchema(BaseModel):
 
     @field_validator('target_price', mode='before')
     @classmethod
-    def round_price(cls, v):
-        return round(float(v), 2)
+    def round(cls, v): return round_price_helper(v)
 
 
 class AlertCreateSchema(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     symbol: str
-    target_price: float
+    target_price: float = Field(gt=0)
     condition: ConditionEnum
 
     @field_validator('target_price', mode='before')
     @classmethod
-    def round_price(cls, v):
-        return round(float(v), 2)
+    def round(cls, v): return round_price_helper(v)
 
 
 class AlertBulkCreateSchema(BaseModel):
@@ -38,15 +38,14 @@ class AlertBulkCreateSchema(BaseModel):
 
 
 class AlertUpdateSchema(BaseModel):
-    id: int
-    target_price: Optional[float] = None
+    model_config = ConfigDict(extra='forbid')
+    id: int 
+    target_price: Optional[float] = Field(None, gt=0)
     condition: Optional[ConditionEnum] = None
-    status: Optional[AlertStatus] = None
 
     @field_validator('target_price', mode='before')
     @classmethod
-    def round_price(cls, v):
-        return round(float(v), 2) if v is not None else v
+    def round(cls, v): return round_price_helper(v)
 
 
 class AlertBulkUpdateSchema(BaseModel):
