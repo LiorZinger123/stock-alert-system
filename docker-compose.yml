@@ -22,7 +22,7 @@ services:
       - "6379:6379"
     restart: always
 
-  web:
+  backend:
     build: .
     volumes:
       - .:/app
@@ -35,16 +35,17 @@ services:
       redis:
         condition: service_started
     environment:
-      - REDIS_HOST=redis
-      - DB_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      - REDIS_HOST=${REDIS_HOST}
+      - DB_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@d${DB_HOST}:5432/${DB_NAME}
       - JWT_SECRET=${JWT_SECRET}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
     restart: always
 
-  producer:
+  price_monitor:
     build: .
     volumes:
       - .:/app
-    command: python -m workers.producer.main
+    command: python -m workers.price_monitor.main
     depends_on:
       db:
         condition: service_healthy
@@ -52,20 +53,35 @@ services:
         condition: service_started
     environment:
       - REDIS_HOST=redis
-      - DB_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      - DB_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}
     restart: always
 
-  consumer:
+  email_producer:
     build: .
     volumes:
       - .:/app
-    command: arq workers.consumer.worker_settings.WorkerSettings
+    command: python -m workers.email_producer.main
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - DB_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}
+    restart: always
+
+  email_consumer:
+    build: .
+    volumes:
+      - .:/app
+    command: arq workers.email_consumer.worker_settings.WorkerSettings
     depends_on:
       redis:
         condition: service_started
     environment:
-      - REDIS_HOST=redis
-      - DB_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      - REDIS_HOST=${REDIS_HOST}
+      - DB_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
     restart: always

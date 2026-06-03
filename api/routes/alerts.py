@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 async def get_user_alerts(
     user_id: int = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db)
-) -> Sequence[Alert]:
+) -> Sequence[AlertReadSchema]:
     try:
         service = AlertService(db)
         return await service.get_all_by_user(user_id)
@@ -60,6 +60,8 @@ async def update_multiple_alerts(
     try:
         service = AlertService(db)
         return await service.bulk_update(user_id, bulk_update.alerts)
+    except HTTPException:
+        raise
     except PermissionError:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -80,6 +82,8 @@ async def delete_multiple_alerts(
         service = AlertService(db)
         count = await service.bulk_delete(user_id, payload.alerts_ids)
         return {"message": f"Successfully deleted {count} alerts"}
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Delete error: {e}")
         raise HTTPException(

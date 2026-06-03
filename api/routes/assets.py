@@ -38,11 +38,12 @@ async def get_asset_details(
         service = AssetService(db)
         live_data = await service.get_live_data(symbol)
         user_alert = await service.get_user_alert_for_asset(user_id, symbol)
-        
+        price = live_data.get("price")
+
         return {
             "symbol": symbol,
             "name": live_data.get("name", symbol),
-            "current_price": live_data.get("price", 0.0),
+            "current_price": float(price) if price is not None else None,
             "user_alert": user_alert
         }
         

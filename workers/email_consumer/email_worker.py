@@ -9,7 +9,15 @@ logger = logging.getLogger("EmailWorker")
 email_service = EmailService()
 
 
-async def send_email_task(_, alert_id: int, user_email: str, symbol: str, target_price: str, current_price: str, condition: ConditionEnum) -> bool:
+async def send_email_task(
+        _,
+        alert_id: int,
+        user_email: str,
+        symbol: str,
+        target_price: str,
+        current_price: str,
+        condition: ConditionEnum
+    ) -> bool:
     logger.info(f"Processing email for alert {alert_id}")
     
     try:
@@ -29,7 +37,7 @@ async def send_email_task(_, alert_id: int, user_email: str, symbol: str, target
         return True
         
     except Exception as e:
-        await alert_service.update_alert_status(alert_id, )
+        await alert_service.update_alert_status(alert_id)
         
         logger.error(f"Failed to send email for {alert_id}: {str(e)}")
         raise e

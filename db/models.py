@@ -26,6 +26,7 @@ class Asset(Base):
     sector = Column(String, nullable=True)
     industry = Column(String, nullable=True)
     exchange = Column(String, nullable=True)
+    last_known_price = Column(Float, nullable=True)
     last_updated = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
 
 
@@ -37,7 +38,8 @@ class Alert(Base):
     condition = Column(Enum(ConditionEnum), nullable=False)
     created_at = Column(DateTime(timezone=True), default=func.now(), server_default=func.now())
     status = Column(Enum(AlertStatus), default=AlertStatus.ACTIVE)
-    last_triggered_at = Column(DateTime, nullable=True)
+    triggered_at = Column(DateTime, nullable=True)
+    triggered_price = Column(Float, nullable=True)
     
     user_id = Column(Integer, ForeignKey("users.id"))
     asset_id = Column(Integer, ForeignKey("assets.id"))

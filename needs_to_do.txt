@@ -1,1 +1,0 @@
-current price 0.0 if no redis - needs to check, maybe another worker to update db price

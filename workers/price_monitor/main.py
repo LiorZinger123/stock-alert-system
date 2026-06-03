@@ -3,6 +3,7 @@ import logging
 from .price_monitor import PriceMonitor
 from core.database import AsyncSessionLocal
 from ..shared.worker_alert_service import WorkerAlertService
+from ..shared.worker_asset_service import WorkerAssetService
 from services.container import notification_service, market_cache
 
 
@@ -14,9 +15,11 @@ async def main():
     logger.info("Initializing worker dependencies...")
     
     alert_service = WorkerAlertService(AsyncSessionLocal)
+    asset_service = WorkerAssetService(AsyncSessionLocal)
     monitor = PriceMonitor(
         market_cache=market_cache,
         alert_service=alert_service,
+        asset_service=asset_service,
         notification_service=notification_service
     )
     

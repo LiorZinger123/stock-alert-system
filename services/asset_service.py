@@ -15,20 +15,23 @@ class AssetService:
 
     async def get_live_data(self, symbol: str) -> dict[str, Any]:
         price = await market_cache.get_price(symbol)
-
-        if price:
-            return {"price": price, "name": "Cached Data"}
+        if price is not None:
+            return {"price": float(price), "name": "Cached Data"}
         
         ticker = yf.Ticker(symbol)
-        info = ticker.fast_info
-        price = info.last_price
-        rounded_price = round(float(price), 2)
-
-        if price:
+        price = ticker.fast_info.last_price
+        
+        if price is not None:
+            rounded_price = round(float(price), 2)
             await market_cache.set_price(symbol, rounded_price)
             
+            return {
+                "price": rounded_price,
+                "name": ticker.info.get("shortName", symbol)
+            }
+        
         return {
-            "price": rounded_price if rounded_price else 0.0,
+            "price": None,
             "name": ticker.info.get("shortName", symbol)
         }
 
