@@ -2,6 +2,7 @@ import logging
 import yfinance as yf
 from sqlalchemy import select
 from fastapi import HTTPException
+from collections.abc import Sequence
 from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.models import Alert, Asset
@@ -16,22 +17,24 @@ class AlertService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    def validate_alert_update(self, alert: Alert):
+    def validate_alert_update(self, alert: Alert) -> None:
         if alert.status == AlertStatus.SENT:
             raise HTTPException(status_code=403, detail=f"Alert {alert.id} is already sent and cannot be modified.")
         
         if alert.status == AlertStatus.PENDING:
             raise HTTPException(status_code=409, detail=f"Alert {alert.id} is in process.")
 
-    async def get_all_by_user(self, user_id: int):
+    async def get_all_by_user(self, user_id: int) -> Sequence[Alert]:
         query = select(Alert).options(joinedload(Alert.asset)).where(Alert.user_id == user_id)
         result = await self.db.execute(query)
         alerts = result.scalars().all()
 
-        for alert in alerts:
-            price = await market_cache.get_price(alert.asset.symbol)
-            alert.asset.current_price = price if price is not None else 0.0
+        symbols = [a.asset.symbol for a in alerts]
+        prices = await market_cache.get_prices_bulk(symbols)
         
+        for alert, price in zip(alerts, prices):
+            alert.asset.current_price = price if price is not None else 0.0
+            
         return alerts
 
     async def get_or_create_assets(self, symbols: list[str]) -> dict:

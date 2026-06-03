@@ -4,7 +4,7 @@ from .email_settings import email_settings
 
 
 class EmailService:
-    async def send(self, email: str, alert_id: int, price: float, condition: str, ticker: str, target_price: str):
+    async def send(self, email: str, alert_id: int, price: float, condition: str, ticker: str, target_price: str) -> None:
         msg = EmailMessage()
         msg["Subject"] = f"Alert Triggered for {ticker}"
         msg["To"] = email

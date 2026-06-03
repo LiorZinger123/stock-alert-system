@@ -21,10 +21,16 @@ async def register(payload: RegisterPayload, response: Response, db: AsyncSessio
         auth_service = AuthService(auth_cache)
         
         if await user_service.get_user_by_username(payload.username):
-            raise HTTPException(status_code=400, detail="Username already taken")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username already taken"
+            )
         
         if await user_service.get_user_by_email(payload.email):
-            raise HTTPException(status_code=400, detail="Email already registered")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered"
+            )
         
         new_user = await user_service.create_user(payload, hash_password(payload.password))
         access, refresh = await auth_service.login_user(new_user)
@@ -35,7 +41,10 @@ async def register(payload: RegisterPayload, response: Response, db: AsyncSessio
         raise
     except Exception as e:
         logger.error(f"Registration error: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
 
 
 @router.post("/login", status_code=status.HTTP_200_OK)
@@ -46,7 +55,10 @@ async def login(payload: Credentials, response: Response, db: AsyncSession = Dep
         user = await user_service.get_user_by_username(payload.username)
 
         if not user or not verify_password(payload.password, user.password):
-            raise HTTPException(status_code=400, detail="Invalid credentials")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid credentials"
+            )
         
         access, refresh = await auth_service.login_user(user)
         set_tokens_cookies(response, access, refresh, TOKEN_COOKIES_EXPIRE_SECONDS)
@@ -55,7 +67,10 @@ async def login(payload: Credentials, response: Response, db: AsyncSession = Dep
         raise
     except Exception as e:
         logger.error(f"Login error: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
 
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
@@ -96,4 +111,7 @@ async def refresh(response: Response,
         raise
     except Exception as e:
         logger.error(f"Refresh error: {e}")
-        raise HTTPException(status_code=401, detail="Invalid session")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid session"
+        )

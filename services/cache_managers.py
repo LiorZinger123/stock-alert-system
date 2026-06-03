@@ -67,4 +67,4 @@ class NotificationService:
             target_price=str(alert.target_price),
             current_price=str(current_price),
             condition=str(alert.condition.value) if hasattr(alert.condition, 'value') else str(alert.condition)
-)
+        )

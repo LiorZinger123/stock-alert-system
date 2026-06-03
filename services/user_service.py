@@ -12,7 +12,7 @@ class UserService:
         result = await self.db.execute(select(User).where(User.username == username))
         return result.scalars().first()
     
-    async def get_user_by_email(self, email: str):
+    async def get_user_by_email(self, email: str) -> User | None:
         result = await self.db.execute(select(User).where(User.email == email))
         return result.scalar_one_or_none()
 

@@ -1,11 +1,10 @@
 import json
-import logging
 from arq import create_pool
 from typing import Optional, Any
 import redis.asyncio as aioredis
+from redis.client import Pipeline
 from arq.connections import RedisSettings
 
-logger = logging.getLogger(__name__)
 
 class RedisService:
     def __init__(self, host: str = "localhost", port: int = 6379, db: int = 0):
@@ -17,7 +16,7 @@ class RedisService:
     async def init_arq(self):
         self.arq_pool = await create_pool(RedisSettings(host=self.host, port=self.port))
 
-    def pipeline(self, **kwargs):
+    def pipeline(self, **kwargs) -> Pipeline:
         return self.client.pipeline(**kwargs)
 
     async def read(self, key: str) -> Optional[Any]:

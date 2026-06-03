@@ -9,7 +9,7 @@ logger = logging.getLogger("EmailWorker")
 email_service = EmailService()
 
 
-async def send_email_task(_, alert_id: int, user_email: str, symbol: str, target_price: str, current_price: str, condition: ConditionEnum):
+async def send_email_task(_, alert_id: int, user_email: str, symbol: str, target_price: str, current_price: str, condition: ConditionEnum) -> bool:
     logger.info(f"Processing email for alert {alert_id}")
     
     try:
