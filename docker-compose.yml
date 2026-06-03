@@ -23,9 +23,9 @@ services:
     restart: always
 
   backend:
-    build: .
+    build: ./backend
     volumes:
-      - .:/app
+      - ./backend:/app
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     ports:
       - "8000:8000"
@@ -36,15 +36,15 @@ services:
         condition: service_started
     environment:
       - REDIS_HOST=${REDIS_HOST}
-      - DB_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@d${DB_HOST}:5432/${DB_NAME}
+      - DB_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}
       - JWT_SECRET=${JWT_SECRET}
       - JWT_ALGORITHM=${JWT_ALGORITHM}
     restart: always
 
   price_monitor:
-    build: .
+    build: ./backend
     volumes:
-      - .:/app
+      - ./backend:/app
     command: python -m workers.price_monitor.main
     depends_on:
       db:
@@ -52,14 +52,14 @@ services:
       redis:
         condition: service_started
     environment:
-      - REDIS_HOST=redis
+      - REDIS_HOST=${REDIS_HOST}
       - DB_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}
     restart: always
 
   email_producer:
-    build: .
+    build: ./backend
     volumes:
-      - .:/app
+      - ./backend:/app
     command: python -m workers.email_producer.main
     depends_on:
       db:
@@ -72,9 +72,9 @@ services:
     restart: always
 
   email_consumer:
-    build: .
+    build: ./backend
     volumes:
-      - .:/app
+      - ./backend:/app
     command: arq workers.email_consumer.worker_settings.WorkerSettings
     depends_on:
       redis:
