@@ -3,6 +3,7 @@ import logging
 import uvicorn
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
 from core.database import engine
 from services.container import redis_service
 from api.routes.auth import router as auth_router
@@ -28,12 +29,23 @@ async def lifespan(_: FastAPI):
     await engine.dispose()
 
 
+origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+]
+
 app = FastAPI(lifespan=lifespan)
 app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
 app.include_router(alerts_router, prefix="/alerts", tags=["Alerts"])
 app.include_router(assets_router, prefix="/assets", tags=["Assets"])
 app.add_middleware(AuthMiddleware)
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/health")
 async def root():
