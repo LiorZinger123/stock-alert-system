@@ -2,9 +2,9 @@ import asyncio
 import logging
 from .price_monitor import PriceMonitor
 from core.database import AsyncSessionLocal
+from services.container import market_cache
 from ..shared.worker_alert_service import WorkerAlertService
 from ..shared.worker_asset_service import WorkerAssetService
-from services.container import notification_service, market_cache
 
 
 logging.basicConfig(level=logging.INFO)
@@ -20,7 +20,6 @@ async def main():
         market_cache=market_cache,
         alert_service=alert_service,
         asset_service=asset_service,
-        notification_service=notification_service
     )
     
     logger.info("Worker started.")

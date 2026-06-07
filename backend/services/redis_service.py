@@ -1,20 +1,14 @@
 import json
-from arq import create_pool
 from typing import Optional, Any
 import redis.asyncio as aioredis
 from redis.client import Pipeline
-from arq.connections import RedisSettings
 
 
 class RedisService:
     def __init__(self, host: str = "localhost", port: int = 6379, db: int = 0):
         self.client = aioredis.Redis(host=host, port=port, db=db, decode_responses=True)
-        self.arq_pool = None
         self.host = host
         self.port = port
-
-    async def init_arq(self):
-        self.arq_pool = await create_pool(RedisSettings(host=self.host, port=self.port))
 
     def pipeline(self, **kwargs) -> Pipeline:
         return self.client.pipeline(**kwargs)
@@ -39,12 +33,5 @@ class RedisService:
     async def delete(self, key: str) -> None:
         await self.client.delete(key)
 
-    async def enqueue_task(self, task_name: str, **kwargs) -> None:
-        if not self.arq_pool:
-            await self.init_arq()
-        await self.arq_pool.enqueue_job(task_name, **kwargs)
-
     async def close(self) -> None:
         await self.client.close()
-        if self.arq_pool:
-            await self.arq_pool.close()

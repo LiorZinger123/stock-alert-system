@@ -2,11 +2,9 @@ import math
 import asyncio
 import logging
 import yfinance as yf
-from db.models import Alert
-from helpers.enums import ConditionEnum, AlertStatus
+from services.cache_managers import MarketCache
 from ..shared.worker_alert_service import WorkerAlertService
 from ..shared.worker_asset_service import WorkerAssetService
-from services.cache_managers import MarketCache, NotificationService
 
 
 logger = logging.getLogger(__name__)
@@ -18,12 +16,10 @@ class PriceMonitor:
             market_cache: MarketCache,
             alert_service: WorkerAlertService,
             asset_service: WorkerAssetService,
-            notification_service: NotificationService
         ):
         self.market_cache = market_cache
         self.alert_service = alert_service
         self.asset_service = asset_service
-        self.notification_service = notification_service
 
     async def run_loop(self, interval: int = 60) -> None:
         logger.info("PriceMonitor started...")

@@ -18,6 +18,20 @@ services:
     image: redis:alpine
     restart: always
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    restart: always
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     build: ./backend
     env_file:
@@ -32,7 +46,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-    restart: always
+      rabbitmq:
+        condition: service_healthy
 
   price_monitor:
     build: ./backend
@@ -46,6 +61,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
     restart: always
 
   email_producer:
@@ -60,6 +77,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
     restart: always
 
   email_consumer:
@@ -68,7 +87,7 @@ services:
       - ./backend/.env
     volumes:
       - ./backend:/app
-    command: arq workers.email_consumer.worker_settings.WorkerSettings
+    command: python -m workers.email_consumer.main
     depends_on:
       redis:
         condition: service_started
@@ -76,3 +95,4 @@ services:
 
 volumes:
   postgres_data:
+  rabbitmq_data:

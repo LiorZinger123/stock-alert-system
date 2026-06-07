@@ -1,8 +1,7 @@
 import json
 from typing import Optional, Any
-from db.models import Alert
 from .redis_service import RedisService
-from helpers.constants import CACHE_TTL_PRICE, EMAIL_NOTIFICATION_QUEUE_NAME
+from helpers.constants import CACHE_TTL_PRICE
 
 
 class AuthCache:
@@ -55,21 +54,3 @@ class MarketCache:
 
     async def set_prices(self, price_dict: dict[str, float]) -> None:
         await self.redis.mset_with_expire(price_dict)
-
-
-class NotificationService:
-    def __init__(self, redis: RedisService):
-        self.redis = redis
-        self.queue_name = EMAIL_NOTIFICATION_QUEUE_NAME
-
-    async def queue_notification(self, alert: Alert, current_price: float) -> None:
-        await self.redis.enqueue_task(
-            "send_email_task",
-            _queue_name=self.queue_name,
-            alert_id=alert.id, 
-            user_email=alert.owner.email,
-            symbol=alert.asset.symbol,
-            target_price=str(alert.target_price),
-            current_price=str(current_price),
-            condition=str(alert.condition.value) if hasattr(alert.condition, 'value') else str(alert.condition)
-        )

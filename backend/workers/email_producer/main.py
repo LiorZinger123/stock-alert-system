@@ -1,10 +1,11 @@
 import asyncio
 import logging
+from core.config import settings
 from .email_producer import EmailProducer
 from core.database import AsyncSessionLocal
-from services.container import notification_service
 from ..shared.worker_alert_service import WorkerAlertService
 from ..shared.worker_asset_service import WorkerAssetService
+from services.notification_service import NotificationService
 
 
 logging.basicConfig(level=logging.INFO)
@@ -16,6 +17,7 @@ async def main():
     
     alert_service = WorkerAlertService(AsyncSessionLocal)
     asset_service = WorkerAssetService(AsyncSessionLocal)
+    notification_service = NotificationService(settings.RABBITMQ_URL)
     monitor = EmailProducer(
         alert_service=alert_service,
         asset_service=asset_service,

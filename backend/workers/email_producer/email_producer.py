@@ -1,10 +1,10 @@
 import logging
 import asyncio
 from db.models import Alert
-from helpers.enums import ConditionEnum, AlertStatus
-from services.cache_managers import NotificationService
+from helpers.enums import ConditionEnum
 from ..shared.worker_alert_service import WorkerAlertService
 from ..shared.worker_asset_service import WorkerAssetService
+from services.notification_service import NotificationService
 
 
 logger = logging.getLogger(__name__)
