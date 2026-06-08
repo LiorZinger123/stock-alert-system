@@ -6,6 +6,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
+    IS_PRODUCTION: str
+
     JWT_SECRET: str
     JWT_ALGORITHM: str
     

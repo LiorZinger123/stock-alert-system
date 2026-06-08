@@ -15,13 +15,16 @@ def set_tokens_cookies(
     refresh_token: str, 
     expire_seconds: int,
 ) -> None:
+    is_prod = settings.IS_PRODUCTION == "True"
+
     response.set_cookie(
         key="lior_access_token",
         value=access_token,
         max_age=expire_seconds,
         httponly=True,
-        secure=True,
-        samesite="lax"
+        secure=is_prod,
+        samesite="lax",
+        path="/"
     )
     
     response.set_cookie(
@@ -29,8 +32,9 @@ def set_tokens_cookies(
         value=refresh_token,
         max_age=expire_seconds,
         httponly=True,
-        secure=True,
-        samesite="lax"
+        secure=is_prod,
+        samesite="lax",
+        path="/"
     )
 
 

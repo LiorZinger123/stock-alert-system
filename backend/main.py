@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from core.database import engine
 from services.container import redis_service
+from api.routes.me import router as me_router
 from api.routes.auth import router as auth_router
 from api.routes.assets import router as assets_router
 from api.routes.alerts import router as alerts_router
@@ -32,12 +33,15 @@ async def lifespan(_: FastAPI):
 origins = [
     "http://localhost:3000",
     "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
 ]
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
 app.include_router(alerts_router, prefix="/alerts", tags=["Alerts"])
 app.include_router(assets_router, prefix="/assets", tags=["Assets"])
+app.include_router(me_router, prefix="/me", tags=["Me"])
 app.add_middleware(AuthMiddleware)
 app.add_middleware(
     CORSMiddleware,
