@@ -1,13 +1,9 @@
 .login-register-container {
   position: relative;
-  max-width: 400px;
   background-color: transparent;
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 20px;
   backdrop-filter: blur(55px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
   padding: 2rem 3rem;
   
 
@@ -25,8 +21,12 @@
 .login-register-inputbox {
   position: relative;
   margin: 30px 0;
-  max-width: 310px;
+  width: 300px;
   border-bottom: 2px solid #fff;
+
+  @media screen and (max-width: $big-mobile-screen-size) {
+    width: 230px; 
+  }
 
   label {
     position: absolute;
@@ -46,7 +46,7 @@
     border: none;
     outline: none;
     font-size: 1rem;
-    padding: 0 35px 0 5px;
+    padding-right: 5px;
     color: #fff;
   }
 
@@ -116,5 +116,37 @@
       border-left: 6px solid transparent;
       border-right: 6px solid transparent;
       border-bottom: 6px solid #ff4d4d;
+    }
+}
+
+.new-update-alert-form-title {
+    text-align: center;
+
+    &.MuiTypography-root {
+        padding: 16px 24px 0 24px;
+    }
+}
+
+.new-update-alert-form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    &.MuiDialogContent-root {
+        overflow: visible;
+    }
+}
+
+.new-update-alert-form-dialog-actions {
+    gap: 16px;
+    
+    &.MuiDialogActions-root {
+        padding: 16px;
+  }
+}
+
+.new-update-alert-cancel-button {
+    &.MuiButtonBase-root {
+        border-color: rgba(255, 255, 255, 0.3);
     }
 }

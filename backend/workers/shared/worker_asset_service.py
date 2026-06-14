@@ -1,6 +1,6 @@
 import logging
 from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from db.models import Asset
 from services.container import market_cache
 
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class WorkerAssetService:
-    def __init__(self, session_factory: AsyncSession):
+    def __init__(self, session_factory: async_sessionmaker[AsyncSession]):
         self.session_factory = session_factory
 
     async def get_latest_prices(self, symbols: list[str]) -> dict[str, float]:

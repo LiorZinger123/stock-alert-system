@@ -1,0 +1,70 @@
+$glass-bg: rgba(255, 255, 255, 0.1);
+$glass-border: 1px solid rgba(255, 255, 255, 0.25);
+$glass-blur: blur(55px);
+
+.alerts-list-wrapper {
+    width: 90%;
+    height: 400px;
+    backdrop-filter: $glass-blur;
+    border: $glass-border;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    padding: 20px 0;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+
+    @media screen and (max-width: $tablet-screen-size) {
+        width: 100%;
+    }
+}
+.alerts-list {
+    width: 95%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 0 10px 20px 10px; 
+    
+    border-bottom: 1px solid $glass-bg;
+    flex: 1 1 auto;
+    overflow-y: auto; 
+    overflow-x: hidden;
+    min-height: 0;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    &::-webkit-scrollbar-thumb { 
+        background-color: rgba(255, 255, 255, 0.2); 
+        border-radius: 10px;
+    }
+
+    > * {
+        flex-shrink: 0;
+        // width: calc(100% - 10px); // Ensures children don't hit the scrollbar area
+    }
+}
+
+.add-alert-btn {
+    width: 150px;
+    height: 40px;
+    border-radius: 10px;
+    border: $glass-bg;
+    color: white;
+    margin-top: 20px;
+    outline: none;
+    flex-shrink: 0;
+    background: $glass-bg;
+    backdrop-filter: $glass-blur;
+    transition: all 0.2s ease;
+    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3);
+
+    &:hover {
+        transform: scale(1.05);
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.15);
+    }
+}

@@ -47,15 +47,29 @@ class AssetService:
         return result.scalars().first()
     
     @alru_cache(maxsize=128)
-    async def search_stocks(self, query: str) -> (list | list[dict[str, Any]]):
+    async def search_stocks(self, query: str) -> list[dict[str, Any]]:
         if len(query) < 2:
             return []
 
         search_results = yf.Search(query)
+        results = []
         
-        results = [
-            {"symbol": item["symbol"], "name": item["longname"]} 
-            for item in search_results.quotes
-        ]
+        for item in search_results.quotes:
+            symbol = item.get("symbol")
+            if not symbol:
+                continue
+
+            results.append({
+                "symbol": symbol,
+                "name": item.get("longname")
+                        or item.get("shortname")
+                        or symbol
+            })
         
         return results
+
+    async def get_price_from_db_by_symbol(self, symbol: str) -> float | None:
+        stmt = select(Asset.last_known_price).where(Asset.symbol == symbol.upper())
+        result = await self.db.execute(stmt)
+        price = result.scalar_one_or_none()
+        return float(price) if price is not None else None

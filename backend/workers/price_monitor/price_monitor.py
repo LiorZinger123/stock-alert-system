@@ -83,7 +83,7 @@ class PriceMonitor:
                 tickers = yf.Tickers(" ".join(chunk))
                 data = tickers.history(period="1d", interval="1m", progress=False)
                 
-                if not data.empty and 'Close' in data.columns:
+                if data is not None and not data.empty and 'Close' in data.columns:
                     latest_data = data['Close'].iloc[-1]
                     batch_prices = latest_data.to_dict()
                     

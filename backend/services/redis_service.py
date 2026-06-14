@@ -1,7 +1,7 @@
 import json
 from typing import Optional, Any
 import redis.asyncio as aioredis
-from redis.client import Pipeline
+from redis.asyncio.client import Pipeline
 
 
 class RedisService:
@@ -21,7 +21,7 @@ class RedisService:
         raw_values = await self.client.mget(keys)
         return [json.loads(v) if v is not None else None for v in raw_values]
 
-    async def write(self, key: str, value: Any, expire: int = None) -> None:
+    async def write(self, key: str, value: Any, expire: Optional[int] = None) -> None:
         await self.client.set(key, json.dumps(value), ex=expire)
 
     async def mset_with_expire(self, mapping: dict[str, Any], expire: int = 60) -> None:

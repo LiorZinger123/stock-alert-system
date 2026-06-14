@@ -1,8 +1,8 @@
 import asyncio
 import logging
 import aio_pika
-from core.config import settings
 from .email_worker import EmailWorker
+from ..shared.worker_config import worker_config
 from helpers.constants import EMAIL_NOTIFICATION_QUEUE_NAME
 
 
@@ -14,7 +14,7 @@ async def main():
     logger.info("Connecting to RabbitMQ...")
     
     email_worker = EmailWorker()
-    connection = await aio_pika.connect_robust(settings.RABBITMQ_URL)
+    connection = await aio_pika.connect_robust(worker_config.RABBITMQ_URL)
     
     async with connection:
         channel = await connection.channel()

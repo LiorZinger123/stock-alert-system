@@ -13,14 +13,16 @@ class AlertReadSchema(BaseModel):
     status: AlertStatus
     created_at: Optional[datetime] = None
     triggered_at: Optional[datetime] = None
-    triggered_price: Optional[float] = Field(default=None, exclude_none=True)
+    triggered_price: Optional[float] = Field(default=None, exclude=None)
+    current_price: Optional[float] = None
     asset: AssetSchema      
     
     model_config = ConfigDict(from_attributes=True)
 
     @field_validator('target_price', mode='before')
     @classmethod
-    def round(cls, v): return round_price_helper(v)
+    def round_target_price(cls, v): 
+        return round_price_helper(v)
 
 
 class AlertCreateSchema(BaseModel):
@@ -32,15 +34,11 @@ class AlertCreateSchema(BaseModel):
 
     @field_validator('target_price', mode='before')
     @classmethod
-    def round(cls, v): return round_price_helper(v)
-
-
-class AlertBulkCreateSchema(BaseModel):
-    alerts: list[AlertCreateSchema]
+    def round_target_price(cls, v): 
+        return round_price_helper(v)
 
 
 class AlertUpdateSchema(BaseModel):
-    id: int 
     target_price: Optional[float] = Field(None, gt=0)
     condition: Optional[ConditionEnum] = None
     status: Optional[Literal[AlertStatus.ACTIVE, AlertStatus.INACTIVE]] = None
@@ -49,12 +47,5 @@ class AlertUpdateSchema(BaseModel):
 
     @field_validator('target_price', mode='before')
     @classmethod
-    def round(cls, v): return round_price_helper(v)
-
-
-class AlertBulkUpdateSchema(BaseModel):
-    alerts: list[AlertUpdateSchema]
-
-
-class AlertBultDeleteSchema(BaseModel):
-    alerts_ids: list[int]
+    def round_target_price(cls, v): 
+        return round_price_helper(v)

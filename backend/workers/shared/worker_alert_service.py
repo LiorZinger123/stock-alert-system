@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from typing import AsyncGenerator
 from sqlalchemy.orm import joinedload
 from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from db.models import Alert, Asset
 from helpers.enums import AlertStatus
 
@@ -12,10 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 class WorkerAlertService:
-    def __init__(self, session_factory: AsyncSession):
+    def __init__(self, session_factory: async_sessionmaker[AsyncSession]):
         self.session_factory = session_factory
 
-    async def get_active_symbols(self) -> list[int]:
+    async def get_active_symbols(self) -> list[str]:
         async with self.session_factory() as session:
             query = (
                 select(Asset.symbol)
@@ -24,7 +24,7 @@ class WorkerAlertService:
                 .distinct()
             )
             result = await session.execute(query)
-            return list(result.scalars().all())
+            return [str(s) for s in result.scalars().all()]
 
     async def stream_active_alerts(self) -> AsyncGenerator[Alert, None]:
         async with self.session_factory() as session:
@@ -45,7 +45,7 @@ class WorkerAlertService:
             query = (
                 update(Alert)
                 .where(Alert.id == alert_id)
-                .values(status=new_status)
+                .values(status=new_status.value)
             )
             await session.execute(query)
             await session.commit()

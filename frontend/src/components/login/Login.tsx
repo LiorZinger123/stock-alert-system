@@ -3,8 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useForm, type SubmitHandler } from "react-hook-form";
 import toast from 'react-hot-toast';
 import Loader from '../Loader/Loader';
-import api from '../../services/api';
-import { login } from "../../services/authService";
+import api from '../../services/api/api';
+import { login } from "../../services/api/authService";
 import type { LoginFormInputs } from "../../utils/interfaces";
 
 const Login = () => {
@@ -34,14 +34,12 @@ const Login = () => {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const response = await api.get("/me", { 
+                await api.get("/me", { 
                     withCredentials: true,
                     skipAuthInterceptor: true 
                 });
 
-                if (response.status === 200) {
-                    navigate("/dashboard");
-                }
+                navigate("/dashboard");
             } catch {
                 console.log("User not logged in");
             }

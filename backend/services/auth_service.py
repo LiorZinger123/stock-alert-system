@@ -58,7 +58,13 @@ class AuthService:
         elif status_val == "used":
             new_refresh_token = token_status.get("new_refresh_token")
             new_refresh_payload = decode_token(new_refresh_token)
-            new_access_token = create_access_token(user_id, username, new_refresh_payload.get("jti"))
+
+            jti = new_refresh_payload.get("jti")
+
+            if jti is None:
+                raise HTTPException(status_code=401, detail="Invalid token: missing JTI")
+            
+            new_access_token = create_access_token(user_id, username, jti)
             
             set_tokens_cookies(response, new_access_token, new_refresh_token, TOKEN_COOKIES_EXPIRE_SECONDS)
             return {"message": "Token refreshed successfully (from cached)"}

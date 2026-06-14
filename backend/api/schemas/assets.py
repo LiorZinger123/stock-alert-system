@@ -9,7 +9,6 @@ class AssetSchema(BaseModel):
     sector: Optional[str] = None
     industry: Optional[str] = None
     exchange: Optional[str] = None
-    current_price: Optional[float] = Field(default=None, exclude_none=True)
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -24,7 +23,7 @@ class AssetAlertPreview(BaseModel):
 class AssetDetailSchema(BaseModel):
     symbol: str
     name: str
-    current_price: Optional[float] = Field(default=None, exclude_none=True)
+    current_price: Optional[float] = Field(default=None, exclude=None)
     user_alert: Optional[AssetAlertPreview] = None
 
     model_config = ConfigDict(from_attributes=True)

@@ -1,0 +1,116 @@
+.alert-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 65px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 0 24px;
+  color: white;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  gap: 20px;
+
+  @media screen and (min-width: $tablet-screen-size) {
+    width: 90%;
+  }
+
+  @media screen and (min-width: $big-mobile-screen-size) and (max-width: $tablet-screen-size) {
+    width: 80%;
+  }
+
+  @media screen and (max-width: $big-mobile-screen-size) {
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .alert-symbol {
+    display: flex;
+    flex-direction: column;
+    max-width: 200px;
+    min-width: 100px;
+    overflow: hidden;
+
+    @media screen and (max-width: $tablet-screen-size) {
+      min-width: 50px;
+      max-width: 60px;
+    }
+
+    .symbol { 
+      font-weight: 700;
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .name {
+      font-size: 12px;
+      opacity: 0.8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .alert-trigger {
+    font-weight: 500;
+    font-size: 15px;
+    flex: 1;
+    max-width: 150px;
+    white-space: nowrap;
+
+    @media screen and (max-width: $tablet-screen-size) {
+      white-space: wrap;
+    }
+
+    .price-value {
+      color: #70f3ff;
+      margin-left: 8px;
+      font-weight: 700;
+    }
+  }
+
+  .alert-status {
+    font-size: 13px;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .alert-row-actions {
+    display: flex;
+    gap: 20px;
+    flex-shrink: 0;
+
+    @media screen and (max-width: $tablet-screen-size) {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .alert-row-action {
+      font-size: 22px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &.edit-icon {
+        color: #ffcc00;
+      }
+
+      &.delete-icon {
+        color: #ff4d4d;
+      }
+
+      &:hover {
+        transform: scale(1.25);
+        filter: brightness(1.2);
+      }
+    }
+  }
+}

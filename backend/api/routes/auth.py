@@ -96,15 +96,22 @@ async def refresh(response: Response,
     
     try:
         payload = decode_token(lior_refresh_token)
-        user_id = int(payload.get("sub"))
+        sub = payload.get("sub")
+        username = payload.get("username")
+        jti = payload.get("jti")
+
+        if sub is None or username is None or jti is None:
+            raise HTTPException(status_code=401, detail="Invalid token: missing required claims")
+            
+        user_id = int(sub)
         auth_service = AuthService(auth_cache)
         
         return await auth_service.refresh_tokens(
             old_refresh_token=lior_refresh_token,
             lior_access_token=lior_access_token,
             user_id=user_id,
-            username=payload.get("username"),
-            refresh_jti=payload.get("jti"),
+            username=username,
+            refresh_jti=jti,
             response=response
         )
     except HTTPException:

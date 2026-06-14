@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import Loader from "../Loader/Loader";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerUser } from "../../services/authService";
+import { registerUser } from "../../services/api/authService";
 import type { RegisterFormInputs } from "../../utils/interfaces";
 import { registerSchema } from "../../utils/schemas";
 
