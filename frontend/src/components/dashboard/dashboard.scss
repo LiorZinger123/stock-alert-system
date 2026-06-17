@@ -6,7 +6,7 @@
     align-items: center;
     overflow: hidden;
 
-    @media screen and (max-width: $tablet-screen-size) {
+    @media screen and (max-width: 1024px) {
         width: 100%;
     }
 }
@@ -58,6 +58,10 @@
 }
 
 .logout-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 80px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);

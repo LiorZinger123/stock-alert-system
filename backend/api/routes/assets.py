@@ -41,3 +41,21 @@ async def get_asset_details(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve asset details. Please try again later."
         )
+
+
+@router.get("/{symbol}/price")
+async def get_asset_price(
+    symbol: str,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)
+) -> dict:
+    try:
+        service = AssetService(db)
+        price = await service.get_price_with_fallback(symbol)
+        return {"symbol": symbol, "price": price}
+    except Exception as e:
+        logger.error(f"Error fetching price for {symbol}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve price."
+        )

@@ -1,11 +1,13 @@
-import type{ AssetDetails } from "../../utils/interfaces";
+import type { AssetDetails } from "../../utils/interfaces";
 import './assetInfo.scss';
 
 interface AssetInfoProps {
   data: AssetDetails;
+  price?: number;
+  isPriceLoading?: boolean;
 }
 
-const AssetInfo = ({ data }: AssetInfoProps) => {
+const AssetInfo = ({ data, price, isPriceLoading }: AssetInfoProps) => {
   return (
     <div className="asset-info-container">
       <div className="asset-header">
@@ -16,7 +18,9 @@ const AssetInfo = ({ data }: AssetInfoProps) => {
         <p>Exchange: <strong>{data.exchange ?? 'N/A'}</strong></p>
         <p>Sector: <strong>{data.sector ?? 'N/A'}</strong></p>
         <p>Industry: <strong>{data.industry ?? 'N/A'}</strong></p>
-        <p>Current Price: <strong>{data.price != null ? `$${data.price}` : 'N/A'}</strong></p>
+        <p>
+          Current Price: <strong>{isPriceLoading ? 'Updating...' : (price != null ? `$${price}` : 'N/A')}</strong>
+        </p>
       </div>
       {data.user_alerts && data.user_alerts.length > 0 && (
         <div className="alerts-wrapper">

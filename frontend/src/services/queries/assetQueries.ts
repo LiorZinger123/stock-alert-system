@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getAssetsBySearch, getAssetDetails } from '../api/assetService';
+import { getAssetsBySearch, getAssetDetails, getAssetPrice } from '../api/assetService';
 
 export const useAssetSearch = (query: string) => {
   return useQuery({
@@ -16,5 +16,15 @@ export const useAssetDetails = (symbol?: string, name?: string) => {
     queryFn: () => getAssetDetails(symbol!, name),
     enabled: !!symbol,
     staleTime: 1000 * 60 * 60,
+  });
+};
+
+export const useAssetPrice = (symbol?: string) => {
+  return useQuery({
+    queryKey: ['assetPrice', symbol],
+    queryFn: () => getAssetPrice(symbol!),
+    enabled: !!symbol,
+    staleTime: 1000 * 30,
+    refetchInterval: 1000 * 60,
   });
 };

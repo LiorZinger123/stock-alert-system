@@ -10,3 +10,8 @@ export const getAssetDetails = async (symbol: string, name?: string): Promise<As
   const res = await api.post(`assets/${symbol}`, { name });
   return res.data;
 };
+
+export const getAssetPrice = async (symbol: string): Promise<number> => {
+  const res = await api.get(`/assets/${symbol}/price`);
+  return res.data?.price;
+};

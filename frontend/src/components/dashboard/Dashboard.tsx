@@ -8,7 +8,7 @@ import { RiLogoutCircleRLine } from "react-icons/ri";
 import { GlassModal } from "../../shared/MuiComponents";
 import { logoutUser } from "../../services/api/authService";
 import type { SearchedAsset } from "../../utils/interfaces";
-import { useAssetDetails } from "../../services/queries/assetQueries";
+import { useAssetDetails, useAssetPrice } from "../../services/queries/assetQueries";
 import './dashboard.scss';
 
 const Dashboard = () => {
@@ -23,6 +23,8 @@ const Dashboard = () => {
     selectedAsset?.symbol ?? "", 
     selectedAsset?.name ?? ""
   );
+
+  const { data: priceData, isLoading: isPriceLoading } = useAssetPrice(selectedAsset?.symbol);
 
   const handleAssetChange = (asset: SearchedAsset | null) => {
     setSelectedAsset(asset);
@@ -57,6 +59,9 @@ const Dashboard = () => {
     <>
       <div className="dashboard">
         <img src='system_logo.jpg' alt="system logo" className="system-logo" />
+        <button className="logout-button" onClick={logout}>
+          <RiLogoutCircleRLine />
+        </button>
         <div className="dashboard-content">
           <div className="asset-search-bar-logout-wrapper">
             <AssetSearchBar
@@ -65,9 +70,6 @@ const Dashboard = () => {
               onChange={handleAssetChange}
               label="Search Asset Info"
             />
-            <button className="logout-button" onClick={logout}>
-              <RiLogoutCircleRLine />
-            </button>
           </div>
           <AlertsList />
         </div>
@@ -79,7 +81,11 @@ const Dashboard = () => {
           }}
         >
           {assetDetails && (
-            <AssetInfo data={assetDetails} />
+            <AssetInfo 
+              data={assetDetails} 
+              price={priceData}
+              isPriceLoading={isPriceLoading}
+            />
           )}
         </GlassModal>
       </div>

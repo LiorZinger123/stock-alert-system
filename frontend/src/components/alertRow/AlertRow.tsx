@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { Tooltip } from '@mui/material';
 import { FiEdit2 } from "react-icons/fi";
 import { MdDeleteOutline } from "react-icons/md";
 import type { Alert } from "../../utils/interfaces"
 import UpdateAlertForm from "../updateAlertForm/UpdateAlertForm";
-import { CustomDialog, GlassModal } from "../../shared/MuiComponents";
 import { useDeleteAlert } from "../../services/queries/alertQueries";
+import { CustomDialog, GlassModal } from "../../shared/MuiComponents";
 import './alertRow.scss'
 
 interface AlertRowProps {
@@ -63,10 +64,12 @@ const AlertRow = ({ alert, setIsPendingUpdate, setIsPendingDelete }: AlertRowPro
   return (
     <>
       <div className="alert-row">
-        <div className="alert-symbol-name">
-          <span className="symbol">{alert.asset.symbol.toUpperCase()}</span>
-          <span className="name">{alert.asset.name}</span>
-        </div>
+        <Tooltip title={`${alert.asset.symbol.toUpperCase()} - ${alert.asset.name}`} arrow>
+          <div className="alert-symbol-name">
+            <span className="symbol">{alert.asset.symbol.toUpperCase()}</span>
+            <span className="name">{alert.asset.name}</span>
+          </div>
+        </Tooltip>
         <div className="alert-trigger">
           <span>Trigger {alert.condition === 'above' ? '>' : '<'}=</span>
           <span className="price-value">${alert.target_price}</span>
