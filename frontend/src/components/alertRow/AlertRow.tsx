@@ -58,12 +58,12 @@ const AlertRow = ({ alert, setIsPendingUpdate, setIsPendingDelete }: AlertRowPro
 
   useEffect(() => {
     setIsPendingDelete(isPendingDelete);
-  }, [isPendingDelete])  
+  }, [isPendingDelete, setIsPendingDelete])  
 
   return (
     <>
       <div className="alert-row">
-        <div className="alert-symbol">
+        <div className="alert-symbol-name">
           <span className="symbol">{alert.asset.symbol.toUpperCase()}</span>
           <span className="name">{alert.asset.name}</span>
         </div>

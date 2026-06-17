@@ -1,11 +1,10 @@
 import logging
-from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, HTTPException, Depends, status
 from core.database import get_db
-from ..schemas.assets import AssetDetailSchema
 from services.asset_service import AssetService
 from helpers.security import get_current_user_id
+from ..schemas.assets import AssetDetails, AssetMetadata
 
 
 router = APIRouter()
@@ -17,9 +16,7 @@ async def search_stocks_route(query: str, db: AsyncSession = Depends(get_db)) ->
     try:
         service = AssetService(db)
         results = await service.search_stocks(query)
-        
         return {"results": results}
-        
     except Exception as e:
         logger.error(f"Error searching stocks with query '{query}': {str(e)}", exc_info=True)
         raise HTTPException(
@@ -28,27 +25,18 @@ async def search_stocks_route(query: str, db: AsyncSession = Depends(get_db)) ->
         )
 
 
-@router.get("/{symbol}", response_model=AssetDetailSchema)
+@router.post("/{symbol}", response_model=AssetDetails)
 async def get_asset_details(
     symbol: str,
+    metadata: AssetMetadata,
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id)
-) -> dict[str, Any]:
+) -> AssetDetails:
     try:
         service = AssetService(db)
-        live_data = await service.get_live_data(symbol)
-        user_alert = await service.get_user_alert_for_asset(user_id, symbol)
-        price = live_data.get("price")
-
-        return {
-            "symbol": symbol,
-            "name": live_data.get("name", symbol),
-            "current_price": float(price) if price is not None else None,
-            "user_alert": user_alert
-        }
-        
+        return await service.get_asset_details(symbol, metadata.name, user_id)
     except Exception as e:
-        logger.error(f"Error fetching asset {symbol} for user {user_id}: {str(e)}", exc_info=True)
+        logger.error(f"Error fetching asset {symbol}: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve asset details. Please try again later."

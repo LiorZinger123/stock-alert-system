@@ -23,6 +23,7 @@ export const useCreateAlert = () => {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: alertKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: ['assetDetails'] });
     },
   });
 };
@@ -36,6 +37,7 @@ export const useUpdateAlert = () => {
       queryClient.invalidateQueries({
         queryKey: alertKeys.lists(),
       });
+      queryClient.invalidateQueries({ queryKey: ['assetDetails'] });
     },
   });
 };
@@ -45,6 +47,7 @@ export const useDeleteAlert = () => {
     mutationFn: deleteUserAlert,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: alertKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: ['assetDetails'] });
     },
   });
 };

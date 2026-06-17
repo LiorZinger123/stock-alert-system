@@ -167,12 +167,13 @@ export const GlassModal = ({ open, onClose, children, maxWidth = 'xs' }: GlassMo
       maxWidth={maxWidth}
       sx={{
         '& .MuiDialog-paper': {
-          background: 'rgba(255, 255, 255, 0.15)',
-          backdropFilter: 'blur(10px)',
+          background: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(20px)',
           borderRadius: '20px',
           color: 'white',
           border: '1px solid rgba(255, 255, 255, 0.2)',
           willChange: 'backdrop-filter',
+          outline: 'None',
         },
       }}
     >
@@ -208,7 +209,7 @@ export const CustomAutocomplete = <T,>(props: AutocompleteProps<T, false, false,
       slotProps={{
         ...props.slotProps,
         paper: {
-          ...props.slotProps?.paper as PaperProps,
+          ...(props.slotProps?.paper as PaperProps),
           sx: {
             background: 'rgba(255, 255, 255, 0.1)',
             backdropFilter: 'blur(10px)',
@@ -216,6 +217,12 @@ export const CustomAutocomplete = <T,>(props: AutocompleteProps<T, false, false,
             border: '1px solid rgba(255, 255, 255, 0.2)',
             '& .MuiAutocomplete-option:hover': {
               background: 'rgba(255, 255, 255, 0.15)',
+            },
+            '& .MuiAutocomplete-noOptions': {
+              color: 'white',
+            },
+            '& .MuiAutocomplete-loading': {
+              color: 'white',
             },
             ...(props.slotProps?.paper as PaperProps)?.sx,
           },
@@ -235,7 +242,7 @@ interface CustomDialogProps {
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement<any, any>;
+    children: React.ReactElement;
   },
   ref: React.Ref<unknown>,
 ) {

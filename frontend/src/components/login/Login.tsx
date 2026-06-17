@@ -1,6 +1,7 @@
 import { useState, Activity, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm, type SubmitHandler } from "react-hook-form";
+import axios from 'axios';
 import toast from 'react-hot-toast';
 import Loader from '../Loader/Loader';
 import api from '../../services/api/api';
@@ -12,27 +13,38 @@ const Login = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const { register, handleSubmit } = useForm<LoginFormInputs>();
 
-    const onSubmit: SubmitHandler<LoginFormInputs> = async(data: LoginFormInputs) => {
+   const onSubmit: SubmitHandler<LoginFormInputs> = async (data: LoginFormInputs) => {
         try {
             setLoading(true);
             await login(data);
-            
             navigate("/dashboard");
-       } catch (err: any) {
-            const status = err.response?.status;
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                const status = err.response?.status;
 
-            if (status === 400) {
-                toast.error("Username or password is incorrect");
+                if (status === 400) {
+                    toast.error("Username or password is incorrect");
+                } else {
+                    toast.error("Failed to login, please try again");
+                }
             } else {
-                toast.error("Failed to login, please try again");
+                toast.error("An unexpected error occurred");
             }
         } finally {
+            localStorage.removeItem('auth_manual_logout');
             setLoading(false);
         }
     };
 
     useEffect(() => {
         const checkAuth = async () => {
+            const isManuallyLoggedOut = localStorage.getItem('auth_manual_logout') === 'true';
+
+            if (isManuallyLoggedOut) {
+                console.log("User manually logged out; skipping auto-login.");
+                return;
+            }
+
             try {
                 await api.get("/me", { 
                     withCredentials: true,
@@ -46,7 +58,7 @@ const Login = () => {
         };
 
         checkAuth();
-    }, []);
+    }, [navigate]);
 
     return (
         <>

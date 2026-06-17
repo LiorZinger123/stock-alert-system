@@ -1,6 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
-from helpers.enums import AlertStatus
+from helpers.enums import AlertStatus, ConditionEnum
 
 
 class AssetSchema(BaseModel):
@@ -9,21 +9,25 @@ class AssetSchema(BaseModel):
     sector: Optional[str] = None
     industry: Optional[str] = None
     exchange: Optional[str] = None
+    price: Optional[float] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class AssetMetadata(BaseModel):
+    name: str | None = None
 
 
 class AssetAlertPreview(BaseModel):
     id: int
     target_price: float
-    condition: str
+    condition: ConditionEnum
     status: AlertStatus
 
+    model_config = ConfigDict(from_attributes=True)
 
-class AssetDetailSchema(BaseModel):
-    symbol: str
-    name: str
-    current_price: Optional[float] = Field(default=None, exclude=None)
-    user_alert: Optional[AssetAlertPreview] = None
+
+class AssetDetails(AssetSchema):
+    user_alerts: Optional[list[AssetAlertPreview]] = None
 
     model_config = ConfigDict(from_attributes=True)

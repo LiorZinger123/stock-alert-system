@@ -36,13 +36,8 @@ export interface SearchedAsset {
   name: string;
 }
 
-export interface NewAlertFromAsset {
-  symbol: string;
-  name: string;
-}
-
 export interface NewAlertFormValues {
-  asset: NewAlertFromAsset | null;
+  asset: SearchedAsset | null;
   targetPrice: string;
   condition: string;
 };
@@ -63,4 +58,21 @@ export interface UpdateAlertFormData {
   target_price: number;
   condition: AlertCondition;
   status: AlertStatus;
+}
+
+interface AssetDetailsAlert {
+  id: number;
+  target_price: number;
+  condition: AlertCondition;
+  status: AlertStatus;
+}
+
+export interface AssetDetails {
+  symbol: string;
+  name?: string | null;
+  sector?: string | null;
+  industry?: string | null;
+  exchange?: string | null;
+  price?: number | null;
+  user_alerts?: AssetDetailsAlert[] | null;
 }

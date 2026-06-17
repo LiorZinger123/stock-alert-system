@@ -4,13 +4,15 @@ $glass-blur: blur(55px);
 
 .alerts-list-wrapper {
     width: 90%;
-    height: 400px;
     backdrop-filter: $glass-blur;
     border: $glass-border;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
     color: white;
     padding: 20px 0;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
@@ -19,6 +21,7 @@ $glass-blur: blur(55px);
         width: 100%;
     }
 }
+
 .alerts-list {
     width: 95%;
     display: flex;
@@ -26,7 +29,6 @@ $glass-blur: blur(55px);
     align-items: center;
     gap: 16px;
     padding: 0 10px 20px 10px; 
-    
     border-bottom: 1px solid $glass-bg;
     flex: 1 1 auto;
     overflow-y: auto; 
@@ -44,27 +46,51 @@ $glass-blur: blur(55px);
 
     > * {
         flex-shrink: 0;
-        // width: calc(100% - 10px); // Ensures children don't hit the scrollbar area
     }
+}
+
+.empty-alerts-state, .error-alerts-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 12px;
+  margin: auto;
+
+  .icon {
+    font-size: 32px;
+  }
 }
 
 .add-alert-btn {
     width: 150px;
     height: 40px;
-    border-radius: 10px;
-    border: $glass-bg;
-    color: white;
-    margin-top: 20px;
-    outline: none;
-    flex-shrink: 0;
-    background: $glass-bg;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
     backdrop-filter: $glass-blur;
-    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    color: white;
+    font-weight: 500;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease-in-out;
 
     &:hover {
-        transform: scale(1.05);
+        background: rgba(255, 255, 255, 0.18);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-2px);
         cursor: pointer;
-        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    &:active {
+        transform: translateY(0);
+        background: rgba(255, 255, 255, 0.25);
     }
 }

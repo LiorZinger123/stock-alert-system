@@ -53,7 +53,7 @@ const NewAlertForm = ({ onClose, setLoading }: NewAlertFormProps) => {
 
   useEffect(() => {
     setLoading(isPending);
-  }, [isPending])
+  }, [isPending, setLoading])
 
   return (
     <>

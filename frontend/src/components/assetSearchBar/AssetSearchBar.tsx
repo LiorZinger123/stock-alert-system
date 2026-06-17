@@ -1,28 +1,43 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react";
 import type { ControllerRenderProps } from "react-hook-form";
 import { useAssetSearch } from "../../services/queries/assetQueries";
+import type { NewAlertFormValues, SearchedAsset } from "../../utils/interfaces";
 import { CustomAutocomplete, CustomTextField } from "../../shared/MuiComponents";
-import type { NewAlertFormValues, NewAlertFromAsset } from "../../utils/interfaces";
 
 interface AssetSearchBarProps {
     field?: ControllerRenderProps<NewAlertFormValues, "asset">;
-    value?: NewAlertFromAsset | null;
-    onChange?: (value: NewAlertFromAsset | null) => void;
+    value?: SearchedAsset | null;
+    onChange?: (value: SearchedAsset | null) => void;
     label?: string;
 }
 
 const AssetSearchBar = ({ field, value, onChange, label }: AssetSearchBarProps) => {
+    const currentValue = field?.value ?? value ?? null;
     const [inputValue, setInputValue] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState('');
     const { data: assets, isLoading } = useAssetSearch(debouncedQuery);
 
-    const handleChange = (_: any, value: any) => {
+    const handleSelectionChange = (
+        _event: React.SyntheticEvent,
+        newValue: SearchedAsset | null
+    ) => {
         if (field?.onChange) {
-            field.onChange(value);
+            field.onChange(newValue);
         } else if (onChange) {
-            onChange(value);
+            onChange(newValue);
         }
-    }
+    };
+
+    const handleInputChange = (
+        _event: React.SyntheticEvent,
+        newInputValue: string,
+        reason: string
+    ) => {
+        setInputValue(newInputValue);
+        if (reason === 'clear') {
+            handleSelectionChange(_event, null);
+        }
+    };
 
     useEffect(() => {
         const t = setTimeout(() => setDebouncedQuery(inputValue), 300);
@@ -31,24 +46,22 @@ const AssetSearchBar = ({ field, value, onChange, label }: AssetSearchBarProps) 
 
     return (
         <CustomAutocomplete
-            value={field?.value !== undefined ? field.value : (value ?? null)}
+            value={currentValue}
             inputValue={inputValue}
-            onInputChange={(_, v) => setInputValue(v)}
+            onInputChange={handleInputChange}
+            onChange={handleSelectionChange}
             options={assets || []}
             loading={isLoading}
             fullWidth
-            getOptionLabel={(option: any) =>
+            getOptionLabel={(option) =>
                 option ? `${option.name} (${option.symbol})` : ''
             }
-            isOptionEqualToValue={(option, value) =>
-                option?.symbol === value?.symbol
-            }
-            onChange={handleChange}
+            isOptionEqualToValue={(option, val) => option.symbol === val.symbol}
             renderInput={(params) => (
                 <CustomTextField {...params} label={label ?? "Search Asset"} />
             )}
         />
-    )
-}
+    );
+};
 
-export default AssetSearchBar
+export default AssetSearchBar;

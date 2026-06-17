@@ -23,7 +23,7 @@ class WorkerAssetService:
 
     async def get_price_from_db_by_symbol(self, symbol: str) -> float | None:
         async with self.session_factory() as session:
-            query = select(Asset.last_known_price).where(Asset.symbol == symbol)
+            query = select(Asset.price).where(Asset.symbol == symbol)
             result = await session.execute(query)
             return result.scalar_one_or_none()
 

@@ -2,8 +2,8 @@ from datetime import datetime
 from typing import Optional, Literal
 from pydantic import BaseModel, ConfigDict, field_validator, Field
 from .assets import AssetSchema
-from helpers.enums import ConditionEnum, AlertStatus
 from helpers.validators import round_price_helper
+from helpers.enums import ConditionEnum, AlertStatus
 
 
 class AlertReadSchema(BaseModel):

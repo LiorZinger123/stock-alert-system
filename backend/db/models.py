@@ -27,7 +27,7 @@ class Asset(Base):
     sector: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     industry: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     exchange: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    last_known_price: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    price: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     last_updated: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), 
         onupdate=func.now(), 
