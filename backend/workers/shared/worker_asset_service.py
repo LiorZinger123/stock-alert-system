@@ -27,14 +27,14 @@ class WorkerAssetService:
             result = await session.execute(query)
             return result.scalar_one_or_none()
 
-    async def bulk_update_last_known_prices(self, price_map: dict[str, float]) -> None:
+    async def bulk_update_prices(self, price_map: dict[str, float]) -> None:
         async with self.session_factory() as session:
             try:
                 for symbol, price in price_map.items():
                     query = (
                         update(Asset)
                         .where(Asset.symbol == symbol)
-                        .values(last_known_price=price)
+                        .values(price=price)
                     )
                     await session.execute(query)
                 

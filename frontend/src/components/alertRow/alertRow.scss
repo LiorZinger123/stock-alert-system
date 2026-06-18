@@ -21,7 +21,7 @@
   }
 
   @media screen and (max-width: $big-mobile-screen-size) {
-    padding: 0 16px;
+    padding: 0 14px;
     gap: 12px;
   }
 
@@ -74,14 +74,6 @@
     }
   }
 
-  .alert-status {
-    font-size: 13px;
-    padding: 6px 12px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    flex-shrink: 0;
-  }
-
   .alert-row-actions {
     display: flex;
     gap: 20px;
@@ -105,9 +97,17 @@
         color: #ff4d4d;
       }
 
-      &:hover {
+      &:not(.disabled):hover {
         transform: scale(1.25);
         filter: brightness(1.2);
+      }
+
+      &.disabled {
+        color: #888888; 
+        cursor: not-allowed;
+        pointer-events: none;
+        filter: grayscale(1) brightness(1.2); 
+        transform: scale(0.95); 
       }
     }
   }

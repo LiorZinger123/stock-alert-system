@@ -1,21 +1,30 @@
 import api from "./api";
 import type { Alert, CreateNewAlertData, UpdateAlertFormData } from "../../utils/interfaces";
 
-export const getUserAlerts = async (): Promise<Alert[]> => {
-    const res = await api.get('/alerts');
-    return res.data
+export const fetchAlertsPaginated = async (
+  offset: number,
+  limit: number = 5, 
+): Promise<Alert[]> => {
+  const { data } = await api.get<Alert[]>("/alerts", {
+    params: {
+      offset,
+      limit,
+    },
+  });
+  return data;
 };
 
 export const createNewAlert = async (data: CreateNewAlertData): Promise<Alert> => {
-    const res = await api.post("/alerts", data);
-    return res.data;
+  const res = await api.post("/alerts", data);
+  return res.data;
 }
 
-export const updateUserAlert = (
-  alertId: number,
+export const updateUserAlert = async (
+  alertId: number, 
   data: UpdateAlertFormData
-): Promise<void> => {
-  return api.put(`/alerts/${alertId}`, data);
+): Promise<Alert> => {
+  const response = await api.put(`/alerts/${alertId}`, data);
+  return response.data; 
 };
 
 export const deleteUserAlert = (alertId: number): Promise<void> => {

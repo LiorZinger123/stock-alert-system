@@ -1,26 +1,26 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useInfiniteQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient';
-import type { CreateNewAlertData, UpdateAlertFormData } from '../../utils/interfaces';
-import { createNewAlert, deleteUserAlert, getUserAlerts, updateUserAlert } from '../api/alertsService';
+import type { CreateNewAlertData, UpdateAlertFormData, Alert } from '../../utils/interfaces';
+import { createNewAlert, deleteUserAlert, fetchAlertsPaginated, updateUserAlert } from '../api/alertsService';
 
 export const alertKeys = {
   all: ['alerts'] as const,
   lists: () => [...alertKeys.all, 'list'] as const,
 };
 
-export const useGetAlerts = () => {
-  return useQuery({
+export const useInfiniteAlerts = () => {
+  return useInfiniteQuery({
     queryKey: alertKeys.lists(),
-    queryFn: getUserAlerts,
-    staleTime: 1000 * 60,
-    refetchInterval: 1000 * 30,
+    queryFn: ({ pageParam }) => fetchAlertsPaginated(pageParam as number),
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length === 5 ? allPages.length * 5 : undefined,
+    initialPageParam: 0,
   });
 };
 
 export const useCreateAlert = () => {
   return useMutation({
     mutationFn: (data: CreateNewAlertData) => createNewAlert(data),
-
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: alertKeys.lists() });
       queryClient.invalidateQueries({ queryKey: ['assetDetails'] });
@@ -30,12 +30,17 @@ export const useCreateAlert = () => {
 
 export const useUpdateAlert = () => {
   return useMutation({
-    mutationFn: ({ alertId, data }: {alertId: number, data: UpdateAlertFormData}) =>
+    mutationFn: ({ alertId, data }: { alertId: number; data: UpdateAlertFormData }) =>
       updateUserAlert(alertId, data),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: alertKeys.lists(),
+    onSuccess: (updatedAlert: Alert) => {
+      queryClient.setQueryData(alertKeys.lists(), (oldData: any) => {
+        if (!oldData) return;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: Alert[]) =>
+            page.map((alert) => (alert.id === updatedAlert.id ? updatedAlert : alert))
+          ),
+        };
       });
       queryClient.invalidateQueries({ queryKey: ['assetDetails'] });
     },
@@ -45,8 +50,16 @@ export const useUpdateAlert = () => {
 export const useDeleteAlert = () => {
   return useMutation({
     mutationFn: deleteUserAlert,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: alertKeys.lists() });
+    onSuccess: (_, alertId: number) => {
+      queryClient.setQueryData(alertKeys.lists(), (oldData: any) => {
+        if (!oldData) return;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: Alert[]) =>
+            page.filter((alert) => alert.id !== alertId)
+          ),
+        };
+      });
       queryClient.invalidateQueries({ queryKey: ['assetDetails'] });
     },
   });

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import type { ControllerRenderProps } from "react-hook-form";
 import { useAssetSearch } from "../../services/queries/assetQueries";
 import type { NewAlertFormValues, SearchedAsset } from "../../utils/interfaces";
@@ -34,15 +34,15 @@ const AssetSearchBar = ({ field, value, onChange, label }: AssetSearchBarProps) 
         reason: string
     ) => {
         setInputValue(newInputValue);
+
         if (reason === 'clear') {
             handleSelectionChange(_event, null);
         }
-    };
+        if (reason === 'reset') return;
 
-    useEffect(() => {
-        const t = setTimeout(() => setDebouncedQuery(inputValue), 300);
+        const t = setTimeout(() => setDebouncedQuery(newInputValue), 300);
         return () => clearTimeout(t);
-    }, [inputValue]);
+    };
 
     return (
         <CustomAutocomplete

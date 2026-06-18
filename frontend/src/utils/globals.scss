@@ -22,7 +22,8 @@
   position: relative;
   margin: 30px 0;
   width: 300px;
-  border-bottom: 2px solid #fff;
+  border-bottom: 2px solid white;
+  display: flex;
 
   @media screen and (max-width: $big-mobile-screen-size) {
     width: 230px; 
@@ -48,11 +49,29 @@
     font-size: 1rem;
     padding-right: 5px;
     color: #fff;
+
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+      box-shadow: 0 0 0px 1000px transparent inset !important;
+      -webkit-text-fill-color: #fff !important;
+      caret-color: #fff;
+      transition: background-color 5000s ease-in-out 0s;
+    }
   }
 
   input:focus ~ label, 
   input:valid ~ label {
       top: -5px;
+  }
+
+  .eye-icon {
+    color: white;
+    font-size: 32px;
+    align-self: end;
+    cursor: pointer;
   }
 }
 
@@ -149,4 +168,44 @@
     &.MuiButtonBase-root {
         border-color: rgba(255, 255, 255, 0.3);
     }
+}
+
+.alert-status {
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  text-transform: uppercase;
+
+  &.active {
+    background: rgba(76, 175, 80, 0.35);
+    color: #b9f6ca;
+    border-color: rgba(76, 175, 80, 0.5);
+  }
+
+  &.inactive {
+    background: rgba(189, 189, 189, 0.25);
+    color: #eeeeee;
+    border-color: rgba(189, 189, 189, 0.4);
+  }
+
+  &.pending {
+    background: rgba(33, 150, 243, 0.35);
+    color: #e3f2fd;
+    border-color: rgba(33, 150, 243, 0.5);
+  }
+  
+  &.sent {
+    background: rgba(171, 71, 188, 0.35);
+    color: #f3e5f5;
+    border-color: rgba(171, 71, 188, 0.5);
+  }
+  
+  &.failed {
+    background: rgba(244, 67, 54, 0.35);
+    color: #ffebee;
+    border-color: rgba(244, 67, 54, 0.5);
+  }
 }

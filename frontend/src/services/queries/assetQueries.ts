@@ -19,11 +19,11 @@ export const useAssetDetails = (symbol?: string, name?: string) => {
   });
 };
 
-export const useAssetPrice = (symbol?: string) => {
+export const useAssetPrice = (symbol?: string, isAssetLoaded?: boolean) => {
   return useQuery({
     queryKey: ['assetPrice', symbol],
     queryFn: () => getAssetPrice(symbol!),
-    enabled: !!symbol,
+    enabled: !!symbol && !!isAssetLoaded,
     staleTime: 1000 * 30,
     refetchInterval: 1000 * 60,
   });

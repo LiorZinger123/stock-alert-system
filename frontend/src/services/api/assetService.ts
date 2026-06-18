@@ -2,8 +2,12 @@ import api from "./api";
 import type { AssetDetails, SearchedAsset } from "../../utils/interfaces";
 
 export const getAssetsBySearch = async (query: string): Promise<SearchedAsset[]> => {
-  const res = await api.get(`/assets/search?query=${query}`);
-  return res.data?.results ?? [];
+  const { data } = await api.get("/assets/search", {
+    params: {
+      query,
+    },
+  });
+  return data?.results ?? [];
 };
 
 export const getAssetDetails = async (symbol: string, name?: string): Promise<AssetDetails> => {

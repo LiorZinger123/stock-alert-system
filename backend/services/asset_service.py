@@ -49,7 +49,6 @@ class AssetService:
 
     async def get_asset_details(self, symbol: str, name: str | None, user_id: int) -> AssetDetails:
         asset = await self.get_or_create_asset(symbol, name)
-        current_price = await self.get_price_with_fallback(asset)
         user_alerts = await self.get_user_alert_for_asset(user_id, symbol)
         
         return AssetDetails(
@@ -58,7 +57,7 @@ class AssetService:
             sector=asset.sector,
             industry=asset.industry,
             exchange=asset.exchange,
-            price=current_price,
+            price=asset.price,
             user_alerts=[AssetAlertPreview.model_validate(alert) for alert in user_alerts]
         )
     

@@ -1,8 +1,11 @@
 import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import axios from 'axios';
 import toast from 'react-hot-toast';
-import { useUpdateAlert } from '../../services/queries/alertQueries';
+import { Controller, useForm } from 'react-hook-form';
 import { DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { isDuplicateAlert } from '../../utils/helpers';
+import { useUpdateAlert, useInfiniteAlerts } from '../../services/queries/alertQueries';
+import { useLoadingStore } from '../../store/useLoadingStore';
 import type { Alert, UpdateAlertFormValues } from '../../utils/interfaces';
 import { conditionOptions, updateAlertStatusOptions } from '../../utils/constants';
 import {
@@ -14,10 +17,12 @@ import {
 interface UpdateAlertFormProps {
   alert: Alert;
   onClose: () => void;
-  setLoading: (value: boolean) => void;
 }
 
-const UpdateAlertForm = ({ alert, onClose, setLoading }: UpdateAlertFormProps) => {
+const UpdateAlertForm = ({ alert, onClose }: UpdateAlertFormProps) => {
+  const { setIsLoading } = useLoadingStore();
+  const { data: alerts } = useInfiniteAlerts();
+  
   const { control, handleSubmit } = useForm<UpdateAlertFormValues>({
     defaultValues: {
       targetPrice: String(alert.target_price),
@@ -30,9 +35,15 @@ const UpdateAlertForm = ({ alert, onClose, setLoading }: UpdateAlertFormProps) =
 
   const onSubmit = (data: UpdateAlertFormValues) => {
     const target_price = Number(data.targetPrice);
+    const allAlerts = alerts?.pages.flatMap((page) => page) || [];
 
     if (!Number.isFinite(target_price) || target_price <= 0) {
       toast.error('Target price must be a valid number greater than 0');
+      return;
+    }
+
+    if (isDuplicateAlert(allAlerts, alert.asset.symbol, target_price, data.condition, alert.id)) {
+      toast.error('You already have an identical alert for this asset.');
       return;
     }
 
@@ -40,6 +51,7 @@ const UpdateAlertForm = ({ alert, onClose, setLoading }: UpdateAlertFormProps) =
       {
         alertId: alert.id,
         data: {
+          symbol: alert.asset.symbol,
           target_price,
           condition: data.condition,
           status: data.status,
@@ -50,16 +62,20 @@ const UpdateAlertForm = ({ alert, onClose, setLoading }: UpdateAlertFormProps) =
           toast.success('Alert updated successfully');
           onClose();
         },
-        onError: () => {
-          toast.error('Failed to update alert');
+        onError: (error) => {
+          if (axios.isAxiosError(error) && error.response?.status === 409) {
+            toast.error('An identical alert already exists.');
+          } else {
+            toast.error('Failed to update alert');
+          }
         },
       }
     );
   };
 
   useEffect(() => {
-    setLoading(isPending);
-  }, [isPending, setLoading]);
+    setIsLoading(isPending);
+  }, [isPending, setIsLoading]);
 
   return (
     <>

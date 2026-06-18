@@ -1,19 +1,24 @@
 import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import axios from 'axios';
 import toast from 'react-hot-toast';
+import { Controller, useForm } from 'react-hook-form';
 import { DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { conditionOptions } from '../../utils/constants';
 import AssetSearchBar from '../assetSearchBar/AssetSearchBar';
-import { useCreateAlert } from '../../services/queries/alertQueries';
+import { isDuplicateAlert } from '../../utils/helpers';
+import { conditionOptions } from '../../utils/constants';
+import { useLoadingStore } from '../../store/useLoadingStore';
 import type { AlertCondition, NewAlertFormValues } from '../../utils/interfaces';
+import { useCreateAlert, useInfiniteAlerts } from '../../services/queries/alertQueries';
 import { ActionButton, CustomSelect, CustomTextField } from '../../shared/MuiComponents';
 
 interface NewAlertFormProps {
   onClose: () => void;
-  setLoading: (value: boolean) => void;
 }
 
-const NewAlertForm = ({ onClose, setLoading }: NewAlertFormProps) => {
+const NewAlertForm = ({ onClose }: NewAlertFormProps) => {
+  const { setIsLoading } = useLoadingStore();
+  const { data: alerts } = useInfiniteAlerts();
+  
   const { control, handleSubmit } = useForm<NewAlertFormValues>({
     defaultValues: {
       asset: null,
@@ -21,39 +26,46 @@ const NewAlertForm = ({ onClose, setLoading }: NewAlertFormProps) => {
       condition: '' as AlertCondition,
     }
   });
+
   const { mutate, isPending } = useCreateAlert();
+
+  useEffect(() => {
+    setIsLoading(isPending);
+  }, [isPending, setIsLoading]);
 
   const onSubmit = (data: NewAlertFormValues) => {
     if (!data.asset) {
+      toast.error("Alert Creation Failed: Asset is required.");
       return;
     }
 
-    const finalTargetPrice = Number(data.targetPrice);
+    const allAlerts = alerts?.pages.flatMap((page) => page) || [];
+    const targetPrice = Number(data.targetPrice);
 
-    if (Number.isNaN(finalTargetPrice) || !Number.isInteger(finalTargetPrice)) {
-      return "Value must be a valid integer";
+    if (isDuplicateAlert(allAlerts, data.asset.symbol, targetPrice, data.condition)) {
+      toast.error("You already have an identical alert for this asset.");
+      return;
     }
 
-    const finalData = {
+    mutate({
       symbol: data.asset.symbol,
-      target_price: finalTargetPrice,
+      name: data.asset.name,
+      target_price: targetPrice,
       condition: data.condition as AlertCondition,
-    }
-
-    mutate(finalData, {
+    }, {
       onSuccess: () => {
         onClose();
-        toast.success("Alert Created Successfully!")
+        toast.success("Alert Created Successfully!");
       },
-      onError: () => {
-        toast.error("Alert Created Failed, Please Try Again Later.")
+      onError: (error) => {
+        if (axios.isAxiosError(error) && error.response?.status === 409) {
+          toast.error("You already have an identical alert for this asset.");
+        } else {
+          toast.error("Failed to create alert. Please try again later.");
+        }
       }
-    })
+    });
   };
-
-  useEffect(() => {
-    setLoading(isPending);
-  }, [isPending, setLoading])
 
   return (
     <>
@@ -63,22 +75,42 @@ const NewAlertForm = ({ onClose, setLoading }: NewAlertFormProps) => {
           <Controller
             name="asset"
             control={control}
+            rules={{ required: true }}
             render={({ field }) => (
-              <AssetSearchBar field={field} />
+              <AssetSearchBar
+                key={field.value ? field.value.symbol : 'reset'}
+                field={field}
+              />
             )}
           />
           <Controller
             name="targetPrice"
             control={control}
-            render={({ field }) => (
-              <CustomTextField {...field} label="Target Price" type="number" />
+            rules={{
+              required: 'Target price is required',
+              validate: (v) => Number.isInteger(Number(v)) || 'Value must be a valid integer',
+            }}
+            render={({ field, fieldState }) => (
+              <CustomTextField
+                {...field}
+                label="Target Price"
+                type="number"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+              />
             )}
           />
           <Controller
             name="condition"
             control={control}
+            rules={{ required: true }}
             render={({ field }) => (
-              <CustomSelect label="Alert Condition" value={field.value} onChange={field.onChange} options={conditionOptions} />
+              <CustomSelect 
+                label="Alert Condition" 
+                value={field.value} 
+                onChange={field.onChange} 
+                options={conditionOptions} 
+              />
             )}
           />
         </DialogContent>

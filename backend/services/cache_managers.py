@@ -44,11 +44,6 @@ class MarketCache:
                 
         return result
     
-    async def get_prices_bulk(self, symbols: list[str]) -> list[float | None]:
-        keys = [f"stock:price:{s}" for s in symbols]
-        prices_dict = await self.get_prices(keys)
-        return [prices_dict.get(key) for key in keys]
-
     async def set_price(self, symbol: str, price: float, expire: int = CACHE_TTL_PRICE) -> None:
         await self.redis.write(f"stock:price:{symbol}", price, expire=expire)
 

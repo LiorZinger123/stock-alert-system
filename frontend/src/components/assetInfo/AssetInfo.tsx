@@ -29,7 +29,7 @@ const AssetInfo = ({ data, price, isPriceLoading }: AssetInfoProps) => {
             <div key={alert.id} className="alert-card">
               <p>Condition: {alert.condition}</p>
               <p>Target: <strong>{alert.target_price}</strong></p>
-              <span className={`status-badge ${alert.status.toLowerCase()}`}>
+              <span className={`status-badge alert-status ${alert.status.toLowerCase()}`}>
                 Status: {alert.status}
               </span>
             </div>

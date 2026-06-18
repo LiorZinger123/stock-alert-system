@@ -67,7 +67,7 @@ class PriceMonitor:
             formatted_updates = {f"stock:price:{s}": p for s, p in updates_needed.items()}
             await self.market_cache.set_prices(formatted_updates)
             
-            await self.asset_service.bulk_update_last_known_prices(updates_needed)
+            await self.asset_service.bulk_update_prices(updates_needed)
         else:
             logger.info("No price changes detected. Systems are up to date.")
 

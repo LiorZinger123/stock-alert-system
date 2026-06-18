@@ -1,24 +1,29 @@
-import { useState, Activity, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm, type SubmitHandler } from "react-hook-form";
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import Loader from '../Loader/Loader';
 import api from '../../services/api/api';
+import { IoEye } from "react-icons/io5";
+import { IoEyeOff } from "react-icons/io5";
 import { login } from "../../services/api/authService";
 import type { LoginFormInputs } from "../../utils/interfaces";
+import { useLoadingStore } from '../../store/useLoadingStore';
 
 const Login = () => {
     const navigate = useNavigate();
-    const [loading, setLoading] = useState<boolean>(false);
+    const { isLoading, setIsLoading } = useLoadingStore((state) => state);
     const { register, handleSubmit } = useForm<LoginFormInputs>();
+    const [showPass, setShowPass] = useState(false);
 
    const onSubmit: SubmitHandler<LoginFormInputs> = async (data: LoginFormInputs) => {
         try {
-            setLoading(true);
+            setIsLoading(true);
             await login(data);
             navigate("/dashboard");
         } catch (err: unknown) {
+            setIsLoading(false);
+
             if (axios.isAxiosError(err)) {
                 const status = err.response?.status;
 
@@ -32,7 +37,6 @@ const Login = () => {
             }
         } finally {
             localStorage.removeItem('auth_manual_logout');
-            setLoading(false);
         }
     };
 
@@ -61,41 +65,40 @@ const Login = () => {
     }, [navigate]);
 
     return (
-        <>
-            <div className='login-register-container'>
-                <form id='login-form' onSubmit={handleSubmit(onSubmit)}>
-                    <h1 className='login-register-title'>Login</h1>
-                    <div className="login-register-inputbox">
-                        <input 
-                            id='username' 
-                            type="text" 
-                            required
-                            autoComplete='off'
-                            {...register("username", { required: true })} 
-                        />
-                        <label htmlFor="username">Username</label>
-                    </div>
-                    <div className="login-register-inputbox">
-                        <input 
-                            id="password" 
-                            type="password" 
-                            required
-                            {...register("password", { required: true })} 
-                        />
-                        <label htmlFor='password'>Password</label>
-                    </div>
-                    <button type="submit" className='login-register-btn' disabled={loading}>
-                        Log in
-                    </button>
-                    <div className="login-register-link">
-                        <p>Don't have an account? <Link to="/register">Register</Link></p>
-                    </div>
-                </form>
-            </div>
-            <Activity mode={loading ? 'visible' : 'hidden'}>
-                <Loader />
-            </Activity>
-        </>
+        <div className='login-register-container'>
+            <form id='login-form' onSubmit={handleSubmit(onSubmit)}>
+                <h1 className='login-register-title'>Login</h1>
+                <div className="login-register-inputbox">
+                    <input 
+                        id='username'
+                        type="text"
+                        required
+                        {...register("username", { required: true })} 
+                    />
+                    <label htmlFor="username">Username</label>
+                </div>
+                <div className="login-register-inputbox">
+                    <input 
+                        id="password" 
+                        type={!showPass ? "password" : "text"}
+                        required
+                        {...register("password", { required: true })} 
+                    />
+                    <label htmlFor='password'>Password</label>
+                    {!showPass ? (
+                        <IoEye className="eye-icon" onClick={() => setShowPass(true)} />
+                    ) : (
+                        <IoEyeOff className="eye-icon" onClick={() => setShowPass(false)} />
+                    )}
+                </div>
+                <button type="submit" className='login-register-btn' disabled={isLoading}>
+                    Log in
+                </button>
+                <div className="login-register-link">
+                    <p>Don't have an account? <Link to="/register">Register</Link></p>
+                </div>
+            </form>
+        </div>
     )
 }
 

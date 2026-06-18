@@ -1,65 +1,63 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import axios from "axios";
+import UpdateAlertForm from "../updateAlertForm/UpdateAlertForm";
 import { Tooltip } from '@mui/material';
 import { FiEdit2 } from "react-icons/fi";
 import { MdDeleteOutline } from "react-icons/md";
-import type { Alert } from "../../utils/interfaces"
-import UpdateAlertForm from "../updateAlertForm/UpdateAlertForm";
+import type { Alert } from "../../utils/interfaces";
+import { alertStatusMap } from "../../utils/constants";
 import { useDeleteAlert } from "../../services/queries/alertQueries";
+import { useLoadingStore } from "../../store/useLoadingStore";
 import { CustomDialog, GlassModal } from "../../shared/MuiComponents";
-import './alertRow.scss'
+import './alertRow.scss';
 
 interface AlertRowProps {
-    alert: Alert;
-    setIsPendingUpdate: (value: boolean) => void;
-    setIsPendingDelete: (value: boolean) => void;
+  alert: Alert;
 }
 
-const AlertRow = ({ alert, setIsPendingUpdate, setIsPendingDelete }: AlertRowProps) => {
-  const [alertId, setAlertId] = useState<number>();
+const AlertRow = ({ alert }: AlertRowProps) => {
+  const { setIsLoading } = useLoadingStore();
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
+  
+  const disabledStatuses = [alertStatusMap.pending, alertStatusMap.sent, alertStatusMap.failed]; 
+  const isDeleteDisabled = disabledStatuses.includes(alert.status);
+
   const { mutate: deleteAlert, isPending: isPendingDelete } = useDeleteAlert();
 
-  const openUpdateAlertDialog = (alertId: number) => {
-    setOpenUpdateDialog(true);
-    setAlertId(alertId);
-  };
+  const handleDelete = () => {
+    if (disabledStatuses.includes(alert.status)) {
+      toast.error("This alert cannot be deleted in its current state.");
+      return;
+    }
 
-  const onCloseUpdateDialog = () => {
-    setOpenUpdateDialog(false)
-    setAlertId(undefined);
-  };
+    deleteAlert(alert.id, {
+      onSuccess: () => {
+        setOpenDeleteDialog(false);
+        toast.success("Alert deleted successfully");
+      },
+      onError: (error) => {
+        if (axios.isAxiosError(error) && error.response) {
+        const status = error.response.status;
 
-  const openDeleteAlertDialog = (alertId: number) => {
-    setOpenDeleteDialog(true);
-    setAlertId(alertId);
-  };
-
-  const onCloseDeleteDialog = () => {
-    setOpenDeleteDialog(false);
-    setAlertId(undefined);
-  };
-
-    const handleDelete = () => {
-    if (alertId) {
-      deleteAlert(alertId, {
-        onSuccess: () => {
-          onCloseDeleteDialog()
-          toast.success("Alert deleted successfully");
-        },
-        onError: () => {
+        if (status === 409) {
+          toast.error("This alert cannot be deleted in its current state.");
+        } else if (status === 423) {
+          toast.error("Alert is currently being processed, please wait.");
+        } else {
           toast.error("Deletion Failed, Please Try Again Later");
         }
-      });
-    } else {
-      toast.error("Deletion Failed, Please Try Again Later");
-    }
+        } else {
+          toast.error("Deletion Failed, Please Try Again Later");
+        }
+      }
+    });
   };
 
   useEffect(() => {
-    setIsPendingDelete(isPendingDelete);
-  }, [isPendingDelete, setIsPendingDelete])  
+    setIsLoading(isPendingDelete);
+  }, [isPendingDelete, setIsLoading]);
 
   return (
     <>
@@ -74,26 +72,33 @@ const AlertRow = ({ alert, setIsPendingUpdate, setIsPendingDelete }: AlertRowPro
           <span>Trigger {alert.condition === 'above' ? '>' : '<'}=</span>
           <span className="price-value">${alert.target_price}</span>
         </div>
-        <div className="alert-status">
+        <div className={`alert-status ${alert.status}`}>
           {alert.status.toUpperCase()}
         </div>
         <div className="alert-row-actions">
-          <FiEdit2 className="alert-row-action edit-icon" onClick={() => openUpdateAlertDialog(alert.id)} />
-          <MdDeleteOutline className="alert-row-action delete-icon" onClick={() => openDeleteAlertDialog(alert.id)} />
+          <FiEdit2 className="alert-row-action edit-icon" onClick={() => setOpenUpdateDialog(true)} />
+          <Tooltip title={isDeleteDisabled ? `Cannot delete ${alert.status} alerts` : ""} arrow>
+            <span>
+              <MdDeleteOutline 
+                className={`alert-row-action delete-icon${isDeleteDisabled ? ' disabled' : ''}`} 
+                onClick={() => !isDeleteDisabled && setOpenDeleteDialog(true)} 
+              />
+            </span>
+          </Tooltip>
         </div>
       </div>
       <CustomDialog 
         open={openDeleteDialog}
-        onClose={onCloseDeleteDialog}
+        onClose={() => setOpenDeleteDialog(false)}
         title="Do you want to delete this alert?"
         description="This change is permanent."
         onClick={handleDelete}
       />
-      <GlassModal open={openUpdateDialog} onClose={onCloseUpdateDialog}>
-        <UpdateAlertForm alert={alert} onClose={onCloseUpdateDialog} setLoading={setIsPendingUpdate} />
+      <GlassModal open={openUpdateDialog} onClose={() => setOpenUpdateDialog(false)}>
+        <UpdateAlertForm alert={alert} onClose={() => setOpenUpdateDialog(false)} />
       </GlassModal>
     </>
-  )
-}
+  );
+};
 
-export default AlertRow
+export default AlertRow;

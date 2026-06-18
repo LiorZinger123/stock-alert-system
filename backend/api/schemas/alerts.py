@@ -27,6 +27,7 @@ class AlertReadSchema(BaseModel):
 
 class AlertCreateSchema(BaseModel):
     symbol: str
+    name: str
     target_price: float = Field(gt=0)
     condition: ConditionEnum
 
@@ -39,6 +40,7 @@ class AlertCreateSchema(BaseModel):
 
 
 class AlertUpdateSchema(BaseModel):
+    symbol: str
     target_price: Optional[float] = Field(None, gt=0)
     condition: Optional[ConditionEnum] = None
     status: Optional[Literal[AlertStatus.ACTIVE, AlertStatus.INACTIVE]] = None

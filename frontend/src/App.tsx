@@ -1,11 +1,16 @@
+import { Activity } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Login from './components/login/Login';
+import Loader from './components/Loader/Loader';
 import Register from './components/register/Register';
 import Dashboard from './components/dashboard/Dashboard';
+import { useLoadingStore } from './store/useLoadingStore';
 import './app.scss'
 
 function App() {
+  const isLoading = useLoadingStore((state) => state.isLoading);
+
   return (
     <div className='app'>  
       <BrowserRouter>
@@ -16,6 +21,9 @@ function App() {
           <Route path="*" element={<Login />} />
         </Routes>
       </BrowserRouter>
+      <Activity mode={isLoading ? 'visible' : 'hidden'}>
+        <Loader />
+      </Activity>
       <Toaster />
     </div>
   )

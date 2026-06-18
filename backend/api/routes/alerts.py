@@ -1,6 +1,6 @@
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import APIRouter,HTTPException, status, Depends
+from fastapi import APIRouter,HTTPException, status, Depends, HTTPException
 from core.database import get_db
 from services.alert_service import AlertService
 from services.asset_service import AssetService
@@ -14,13 +14,15 @@ logger = logging.getLogger(__name__)
 
 @router.get("", response_model=list[AlertReadSchema])
 async def get_user_alerts(
+    offset: int,
+    limit: int,
     user_id: int = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db)
 ) -> list[AlertReadSchema]:
     try:
         asset_service = AssetService(db)
         alert_service = AlertService(db, asset_service)
-        return await alert_service.get_all_by_user(user_id)
+        return await alert_service.get_all_by_user(user_id, offset, limit)
     except Exception as e:
         logger.error(f"Error fetching alerts: {e}")
         raise HTTPException(
@@ -39,6 +41,8 @@ async def create_alert(
         asset_service = AssetService(db)
         alert_service = AlertService(db, asset_service)
         return await alert_service.create_new_alert(user_id, new_alert)
+    except HTTPException:
+        raise
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

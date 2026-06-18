@@ -1,4 +1,4 @@
-import type { AlertCondition } from "./interfaces";
+import type { AlertCondition, AlertStatus } from "./interfaces";
 
 export const alertConditionMap: Record<AlertCondition, string> = {
   above: "Above (>=)",
@@ -14,3 +14,11 @@ export const updateAlertStatusOptions = [
   { label: 'Active', value: 'active' },
   { label: 'Inactive', value: 'inactive' },
 ];
+
+export const alertStatusMap: Record<AlertStatus, string> = {
+  active: "active",
+  inactive: "inactive",
+  pending: "pending",
+  sent: "sent",
+  failed: "failed",
+};

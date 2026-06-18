@@ -18,7 +18,7 @@ interface Asset {
   current_price?: number;
 }
 
-type AlertStatus = "active" | "inactive" | "pending" | "sent" | "failed"
+export type AlertStatus = "active" | "inactive" | "pending" | "sent" | "failed"
 
 export interface Alert {
   id: number;
@@ -44,6 +44,7 @@ export interface NewAlertFormValues {
 
 export interface CreateNewAlertData {
   symbol: string;
+  name: string;
   target_price: number;
   condition: AlertCondition;
 }
@@ -55,6 +56,7 @@ export interface UpdateAlertFormValues {
 }
 
 export interface UpdateAlertFormData {
+  symbol: string;
   target_price: number;
   condition: AlertCondition;
   status: AlertStatus;
