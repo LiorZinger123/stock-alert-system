@@ -1,16 +1,16 @@
 import React from "react";
 import {
   Slide,
-  Dialog, 
-  Button, 
+  Dialog,
+  Button,
   Select,
   MenuItem,
-  TextField, 
-  InputLabel, 
-  FormControl, 
+  TextField,
+  InputLabel,
+  FormControl,
   DialogTitle,
   Autocomplete,
-  DialogContent, 
+  DialogContent,
   DialogActions,
   DialogContentText,
   type PaperProps,
@@ -18,10 +18,10 @@ import {
   type TextFieldProps,
   type SelectChangeEvent,
   type AutocompleteProps,
-} from '@mui/material';
-import type { TransitionProps } from '@mui/material/transitions';
+} from "@mui/material";
+import type { TransitionProps } from "@mui/material/transitions";
 
-interface CustomTextFieldProps extends Omit<TextFieldProps, 'variant'> {
+interface CustomTextFieldProps extends Omit<TextFieldProps, "variant"> {
   label: string;
 }
 
@@ -45,55 +45,55 @@ export const CustomTextField = ({
       autoComplete="off"
       type={type}
       sx={{
-        '& .MuiInputLabel-root': {
-          color: 'white',
+        "& .MuiInputLabel-root": {
+          color: "white",
         },
-        '& .MuiInputLabel-root.Mui-focused': {
-          color: 'white',
+        "& .MuiInputLabel-root.Mui-focused": {
+          color: "white",
         },
-        '& .MuiInputLabel-root.MuiInputLabel-shrink': {
-          color: 'white',
+        "& .MuiInputLabel-root.MuiInputLabel-shrink": {
+          color: "white",
         },
-        '& .MuiInputBase-input:-webkit-autofill': {
+        "& .MuiInputBase-input:-webkit-autofill": {
           WebkitBoxShadow:
-            '0 0 0 100px rgba(255, 255, 255, 0.1) inset !important',
-          WebkitTextFillColor: 'white !important',
-          borderRadius: '8px',
+            "0 0 0 100px rgba(255, 255, 255, 0.1) inset !important",
+          WebkitTextFillColor: "white !important",
+          borderRadius: "8px",
         },
-        '& .MuiOutlinedInput-root': {
-          color: 'white',
-          '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'rgba(255, 255, 255, 0.5)',
-            transition: '0.2s',
+        "& .MuiOutlinedInput-root": {
+          color: "white",
+          "& .MuiOutlinedInput-notchedOutline": {
+            borderColor: "rgba(255, 255, 255, 0.5)",
+            transition: "0.2s",
           },
 
-          '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'white',
+          "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "white",
           },
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'white',
-            borderWidth: '2px',
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "white",
+            borderWidth: "2px",
           },
         },
-        '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button':
+        "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
           {
-            WebkitAppearance: 'none',
+            WebkitAppearance: "none",
             margin: 0,
           },
 
-        '& input[type=number]': {
-          MozAppearance: 'textfield',
+        "& input[type=number]": {
+          MozAppearance: "textfield",
         },
-        '& .Mui-disabled': {
-          color: 'rgba(255, 255, 255, 0.3) !important',
-          WebkitTextFillColor: 'rgba(255, 255, 255, 0.3) !important',
-          
-          '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'rgba(255, 255, 255, 0.15) !important',
+        "& .Mui-disabled": {
+          color: "rgba(255, 255, 255, 0.3) !important",
+          WebkitTextFillColor: "rgba(255, 255, 255, 0.3) !important",
+
+          "& .MuiOutlinedInput-notchedOutline": {
+            borderColor: "rgba(255, 255, 255, 0.15) !important",
           },
         },
-        '& .MuiInputLabel-root.Mui-disabled': {
-          color: 'rgba(255, 255, 255, 0.3) !important',
+        "& .MuiInputLabel-root.Mui-disabled": {
+          color: "rgba(255, 255, 255, 0.3) !important",
         },
         ...sx,
       }}
@@ -108,10 +108,15 @@ interface CustomSelectProps {
   options: { label: string; value: string }[];
 }
 
-export const CustomSelect = ({ label, value, onChange, options }: CustomSelectProps) => {
+export const CustomSelect = ({
+  label,
+  value,
+  onChange,
+  options,
+}: CustomSelectProps) => {
   return (
     <FormControl fullWidth>
-      <InputLabel sx={{ color: 'white !important' }}>{label}</InputLabel>
+      <InputLabel sx={{ color: "white !important" }}>{label}</InputLabel>
       <Select
         value={value}
         onChange={onChange}
@@ -120,27 +125,31 @@ export const CustomSelect = ({ label, value, onChange, options }: CustomSelectPr
           slotProps: {
             paper: {
               sx: {
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(10px)',
-                color: 'white',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                background: "rgba(255, 255, 255, 0.1)",
+                backdropFilter: "blur(10px)",
+                color: "white",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
               },
             },
           },
         }}
         sx={{
-          color: 'white',
-          '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.5)' },
-          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
-          '.MuiSvgIcon-root': { color: 'white' },
+          color: "white",
+          ".MuiOutlinedInput-notchedOutline": {
+            borderColor: "rgba(255, 255, 255, 0.5)",
+          },
+          "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "white",
+          },
+          ".MuiSvgIcon-root": { color: "white" },
         }}
       >
         {options.map((opt) => (
-          <MenuItem 
-            key={opt.value} 
+          <MenuItem
+            key={opt.value}
             value={opt.value}
-            sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.15)' } }}
+            sx={{ "&:hover": { background: "rgba(255, 255, 255, 0.15)" } }}
           >
             {opt.label}
           </MenuItem>
@@ -154,10 +163,15 @@ interface GlassModalProps {
   open: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  maxWidth?: 'xs' | 'sm' | 'md';
+  maxWidth?: "xs" | "sm" | "md";
 }
 
-export const GlassModal = ({ open, onClose, children, maxWidth = 'xs' }: GlassModalProps) => {
+export const GlassModal = ({
+  open,
+  onClose,
+  children,
+  maxWidth = "xs",
+}: GlassModalProps) => {
   return (
     <Dialog
       open={open}
@@ -166,14 +180,14 @@ export const GlassModal = ({ open, onClose, children, maxWidth = 'xs' }: GlassMo
       fullWidth
       maxWidth={maxWidth}
       sx={{
-        '& .MuiDialog-paper': {
-          background: 'rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(20px)',
-          borderRadius: '20px',
-          color: 'white',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          willChange: 'backdrop-filter',
-          outline: 'None',
+        "& .MuiDialog-paper": {
+          background: "rgba(255, 255, 255, 0.1)",
+          backdropFilter: "blur(20px)",
+          borderRadius: "20px",
+          color: "white",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+          willChange: "backdrop-filter",
+          outline: "None",
         },
       }}
     >
@@ -187,8 +201,8 @@ export const ActionButton = ({ children, sx, ...props }: ButtonProps) => {
     <Button
       {...props}
       sx={{
-        textTransform: 'none',
-        borderRadius: '12px',
+        textTransform: "none",
+        borderRadius: "12px",
         px: 3,
         ...sx,
       }}
@@ -198,12 +212,14 @@ export const ActionButton = ({ children, sx, ...props }: ButtonProps) => {
   );
 };
 
-export const CustomAutocomplete = <T,>(props: AutocompleteProps<T, false, false, false>) => {
+export const CustomAutocomplete = <T,>(
+  props: AutocompleteProps<T, false, false, false>,
+) => {
   return (
     <Autocomplete
       {...props}
       sx={{
-        '& .MuiAutocomplete-endAdornment .MuiSvgIcon-root': { color: 'white' },
+        "& .MuiAutocomplete-endAdornment .MuiSvgIcon-root": { color: "white" },
         ...props.sx,
       }}
       slotProps={{
@@ -211,18 +227,18 @@ export const CustomAutocomplete = <T,>(props: AutocompleteProps<T, false, false,
         paper: {
           ...(props.slotProps?.paper as PaperProps),
           sx: {
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(10px)',
-            color: 'white',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            '& .MuiAutocomplete-option:hover': {
-              background: 'rgba(255, 255, 255, 0.15)',
+            background: "rgba(255, 255, 255, 0.1)",
+            backdropFilter: "blur(10px)",
+            color: "white",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+            "& .MuiAutocomplete-option:hover": {
+              background: "rgba(255, 255, 255, 0.15)",
             },
-            '& .MuiAutocomplete-noOptions': {
-              color: 'white',
+            "& .MuiAutocomplete-noOptions": {
+              color: "white",
             },
-            '& .MuiAutocomplete-loading': {
-              color: 'white',
+            "& .MuiAutocomplete-loading": {
+              color: "white",
             },
             ...(props.slotProps?.paper as PaperProps)?.sx,
           },
@@ -233,11 +249,11 @@ export const CustomAutocomplete = <T,>(props: AutocompleteProps<T, false, false,
 };
 
 interface CustomDialogProps {
-    open: boolean;
-    title: string;
-    description: string;
-    onClose: () => void;
-    onClick: () => void;
+  open: boolean;
+  title: string;
+  description: string;
+  onClose: () => void;
+  onClick: () => void;
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -249,49 +265,57 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export const CustomDialog = ({ open, onClose, title, description, onClick }: CustomDialogProps) => {
+export const CustomDialog = ({
+  open,
+  onClose,
+  title,
+  description,
+  onClick,
+}: CustomDialogProps) => {
   return (
     <Dialog
       open={open}
       onClose={onClose}
       slots={{ transition: Transition }}
       sx={{
-        '& .MuiDialog-paper': {
-          width: '450px',
-          borderRadius: '20px',
-          padding: '8px',
-          background: 'rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          boxShadow: '0px 10px 30px rgba(0,0,0,0.3)',
-          color: 'white',
-          outline: 'none',
+        "& .MuiDialog-paper": {
+          width: "450px",
+          borderRadius: "20px",
+          padding: "8px",
+          background: "rgba(255, 255, 255, 0.1)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+          boxShadow: "0px 10px 30px rgba(0,0,0,0.3)",
+          color: "white",
+          outline: "none",
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: '700', pb: 1, color: 'white' }}>
+      <DialogTitle sx={{ fontWeight: "700", pb: 1, color: "white" }}>
         {title}
       </DialogTitle>
       <DialogContent>
-        <DialogContentText sx={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.95rem' }}>
+        <DialogContentText
+          sx={{ color: "rgba(255, 255, 255, 0.7)", fontSize: "0.95rem" }}
+        >
           {description}
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ p: 2, gap: 1 }}>
-        <ActionButton 
-          onClick={onClose} 
-          variant="outlined" 
+        <ActionButton
+          onClick={onClose}
+          variant="outlined"
           color="inherit"
-          sx={{ 
-            borderColor: 'rgba(255, 255, 255, 0.3)',
+          sx={{
+            borderColor: "rgba(255, 255, 255, 0.3)",
           }}
         >
           Cancel
         </ActionButton>
-        <ActionButton 
-          onClick={onClick} 
-          variant="contained" 
-          color="error" 
+        <ActionButton
+          onClick={onClick}
+          variant="contained"
+          color="error"
           disableElevation
         >
           confirm

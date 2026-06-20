@@ -1,9 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
-import { getAssetsBySearch, getAssetDetails, getAssetPrice } from '../api/assetService';
+import { useQuery } from "@tanstack/react-query";
+import {
+  getAssetsBySearch,
+  getAssetDetails,
+  getAssetPrice,
+} from "../api/assetService";
 
 export const useAssetSearch = (query: string) => {
   return useQuery({
-    queryKey: ['assets', query], 
+    queryKey: ["assets", query],
     queryFn: () => getAssetsBySearch(query),
     enabled: query.length >= 2,
     staleTime: 1000 * 60 * 5,
@@ -12,8 +16,13 @@ export const useAssetSearch = (query: string) => {
 
 export const useAssetDetails = (symbol?: string, name?: string) => {
   return useQuery({
-    queryKey: ['assetDetails', symbol],
-    queryFn: () => getAssetDetails(symbol!, name),
+    queryKey: ["assetDetails", symbol],
+    queryFn: () => {
+      if (!symbol) {
+        throw new Error("Symbol is required");
+      }
+      return getAssetDetails(symbol, name);
+    },
     enabled: !!symbol,
     staleTime: 1000 * 60 * 60,
   });
@@ -21,8 +30,13 @@ export const useAssetDetails = (symbol?: string, name?: string) => {
 
 export const useAssetPrice = (symbol?: string, isAssetLoaded?: boolean) => {
   return useQuery({
-    queryKey: ['assetPrice', symbol],
-    queryFn: () => getAssetPrice(symbol!),
+    queryKey: ["assetPrice", symbol],
+    queryFn: () => {
+      if (!symbol) {
+        throw new Error("Symbol is required");
+      }
+      return getAssetPrice(symbol);
+    },
     enabled: !!symbol && !!isAssetLoaded,
     staleTime: 1000 * 30,
     refetchInterval: 1000 * 60,

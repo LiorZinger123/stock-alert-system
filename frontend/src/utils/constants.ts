@@ -5,14 +5,16 @@ export const alertConditionMap: Record<AlertCondition, string> = {
   below: "Below (<=)",
 };
 
-export const conditionOptions = (Object.keys(alertConditionMap) as AlertCondition[]).map((key) => ({
+export const conditionOptions = (
+  Object.keys(alertConditionMap) as AlertCondition[]
+).map((key) => ({
   label: alertConditionMap[key],
   value: key,
 }));
 
 export const updateAlertStatusOptions = [
-  { label: 'Active', value: 'active' },
-  { label: 'Inactive', value: 'inactive' },
+  { label: "Active", value: "active" },
+  { label: "Inactive", value: "inactive" },
 ];
 
 export const alertStatusMap: Record<AlertStatus, string> = {
@@ -24,8 +26,8 @@ export const alertStatusMap: Record<AlertStatus, string> = {
 };
 
 export const webSocketMessageTypes: Record<string, string> = {
-  alertStatus: "ALERT_STATUS_UPDATE"
-}
+  alertStatus: "ALERT_STATUS_UPDATE",
+};
 
-export const backendBaseUrl = "http://localhost:8000"
-export const wsBaseUrl = backendBaseUrl.replace(/^http/, 'ws');
+export const backendBaseUrl = "http://localhost:8000";
+export const wsBaseUrl = backendBaseUrl.replace(/^http/, "ws");

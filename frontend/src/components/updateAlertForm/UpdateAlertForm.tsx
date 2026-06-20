@@ -1,18 +1,24 @@
-import { useEffect } from 'react';
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import { Controller, useForm } from 'react-hook-form';
-import { DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { isDuplicateAlert } from '../../utils/helpers';
-import { useUpdateAlert, useInfiniteAlerts } from '../../services/queries/alertQueries';
-import { useLoadingStore } from '../../store/useLoadingStore';
-import type { Alert, UpdateAlertFormValues } from '../../utils/interfaces';
-import { conditionOptions, updateAlertStatusOptions } from '../../utils/constants';
+import { useEffect } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { Controller, useForm } from "react-hook-form";
+import { DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { isDuplicateAlert } from "../../utils/helpers";
+import {
+  useUpdateAlert,
+  useInfiniteAlerts,
+} from "../../services/queries/alertQueries";
+import { useLoadingStore } from "../../store/useLoadingStore";
+import type { Alert, UpdateAlertFormValues } from "../../utils/interfaces";
+import {
+  conditionOptions,
+  updateAlertStatusOptions,
+} from "../../utils/constants";
 import {
   ActionButton,
   CustomSelect,
   CustomTextField,
-} from '../../shared/MuiComponents';
+} from "../../shared/MuiComponents";
 
 interface UpdateAlertFormProps {
   alert: Alert;
@@ -22,7 +28,7 @@ interface UpdateAlertFormProps {
 const UpdateAlertForm = ({ alert, onClose }: UpdateAlertFormProps) => {
   const { setIsLoading } = useLoadingStore();
   const { data: alerts } = useInfiniteAlerts();
-  
+
   const { control, handleSubmit } = useForm<UpdateAlertFormValues>({
     defaultValues: {
       targetPrice: String(alert.target_price),
@@ -38,12 +44,20 @@ const UpdateAlertForm = ({ alert, onClose }: UpdateAlertFormProps) => {
     const allAlerts = alerts?.pages.flatMap((page) => page) || [];
 
     if (!Number.isFinite(target_price) || target_price <= 0) {
-      toast.error('Target price must be a valid number greater than 0');
+      toast.error("Target price must be a valid number greater than 0");
       return;
     }
 
-    if (isDuplicateAlert(allAlerts, alert.asset.symbol, target_price, data.condition, alert.id)) {
-      toast.error('You already have an identical alert for this asset.');
+    if (
+      isDuplicateAlert(
+        allAlerts,
+        alert.asset.symbol,
+        target_price,
+        data.condition,
+        alert.id,
+      )
+    ) {
+      toast.error("You already have an identical alert for this asset.");
       return;
     }
 
@@ -59,17 +73,17 @@ const UpdateAlertForm = ({ alert, onClose }: UpdateAlertFormProps) => {
       },
       {
         onSuccess: () => {
-          toast.success('Alert updated successfully');
+          toast.success("Alert updated successfully");
           onClose();
         },
         onError: (error) => {
           if (axios.isAxiosError(error) && error.response?.status === 409) {
-            toast.error('An identical alert already exists.');
+            toast.error("An identical alert already exists.");
           } else {
-            toast.error('Failed to update alert');
+            toast.error("Failed to update alert");
           }
         },
-      }
+      },
     );
   };
 
@@ -79,7 +93,9 @@ const UpdateAlertForm = ({ alert, onClose }: UpdateAlertFormProps) => {
 
   return (
     <>
-      <DialogTitle className="new-update-alert-form-title">Update Alert</DialogTitle>
+      <DialogTitle className="new-update-alert-form-title">
+        Update Alert
+      </DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent className="new-update-alert-form-content">
           <CustomTextField
@@ -126,10 +142,20 @@ const UpdateAlertForm = ({ alert, onClose }: UpdateAlertFormProps) => {
           />
         </DialogContent>
         <DialogActions className="new-update-alert-form-dialog-actions">
-          <ActionButton onClick={onClose} variant="outlined" color="inherit" className="new-update-alert-cancel-button">
+          <ActionButton
+            onClick={onClose}
+            variant="outlined"
+            color="inherit"
+            className="new-update-alert-cancel-button"
+          >
             Cancel
           </ActionButton>
-          <ActionButton type="submit" variant="contained" color="error" disableElevation>
+          <ActionButton
+            type="submit"
+            variant="contained"
+            color="error"
+            disableElevation
+          >
             Update
           </ActionButton>
         </DialogActions>

@@ -5,29 +5,38 @@ import AlertsList from "../alertsList/AlertsList";
 import AssetSearchBar from "../assetSearchBar/AssetSearchBar";
 import { RiLogoutCircleRLine } from "react-icons/ri";
 import { GlassModal } from "../../shared/MuiComponents";
-import { useAuthStore } from '../../store/useAuthStore';
+import { useAuthStore } from "../../store/useAuthStore";
 import { logoutUser } from "../../services/api/authService";
 import type { SearchedAsset } from "../../utils/interfaces";
 import { useLoadingStore } from "../../store/useLoadingStore";
 import { useInfiniteAlerts } from "../../services/queries/alertQueries";
-import { useAssetDetails, useAssetPrice } from "../../services/queries/assetQueries";
-import './dashboard.scss';
+import {
+  useAssetDetails,
+  useAssetPrice,
+} from "../../services/queries/assetQueries";
+import "./dashboard.scss";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { setIsLoading } = useLoadingStore();
-  const { clearUser }  = useAuthStore((state) => state)
+  const { clearUser } = useAuthStore((state) => state);
   const { status, isFetchingNextPage } = useInfiniteAlerts();
-  const [selectedAsset, setSelectedAsset] = useState<SearchedAsset | null>(null);
+  const [selectedAsset, setSelectedAsset] = useState<SearchedAsset | null>(
+    null,
+  );
   const [isAssetDialogOpen, setIsAssetDialogOpen] = useState(false);
   const dialogOpenedRef = useRef(false);
 
-  const { data: assetDetails, isLoading: isDetailsLoading, isSuccess: isAssetDataSuccess } = useAssetDetails(
-    selectedAsset?.symbol ?? "", 
-    selectedAsset?.name ?? ""
-  );
+  const {
+    data: assetDetails,
+    isLoading: isDetailsLoading,
+    isSuccess: isAssetDataSuccess,
+  } = useAssetDetails(selectedAsset?.symbol ?? "", selectedAsset?.name ?? "");
 
-  const { data: priceData, isLoading: isPriceLoading } = useAssetPrice(selectedAsset?.symbol, isAssetDataSuccess);
+  const { data: priceData, isLoading: isPriceLoading } = useAssetPrice(
+    selectedAsset?.symbol,
+    isAssetDataSuccess,
+  );
 
   const handleAssetChange = (asset: SearchedAsset | null) => {
     setSelectedAsset(asset);
@@ -42,7 +51,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
-      localStorage.setItem('auth_manual_logout', 'true');
+      localStorage.setItem("auth_manual_logout", "true");
       clearUser();
       navigate("/login");
       setIsLoading(false);
@@ -57,19 +66,21 @@ const Dashboard = () => {
   }, [assetDetails, selectedAsset]);
 
   useEffect(() => {
-    setIsLoading(status === 'pending' || isFetchingNextPage || isDetailsLoading);
+    setIsLoading(
+      status === "pending" || isFetchingNextPage || isDetailsLoading,
+    );
   }, [status, isFetchingNextPage, isDetailsLoading, setIsLoading]);
 
   return (
     <div className="dashboard">
-      <img src='system_logo.jpg' alt="system logo" className="system-logo" />
+      <img src="system_logo.jpg" alt="system logo" className="system-logo" />
       <button className="logout-button" onClick={logout}>
         <RiLogoutCircleRLine />
       </button>
       <div className="dashboard-content">
         <div className="asset-search-bar-wrapper">
           <AssetSearchBar
-            key={selectedAsset ? selectedAsset.symbol : 'reset'}
+            key={selectedAsset ? selectedAsset.symbol : "reset"}
             value={selectedAsset}
             onChange={handleAssetChange}
             label="Search Asset Info"
@@ -77,16 +88,16 @@ const Dashboard = () => {
         </div>
         <AlertsList />
       </div>
-      <GlassModal 
-        open={isAssetDialogOpen} 
+      <GlassModal
+        open={isAssetDialogOpen}
         onClose={() => {
           setIsAssetDialogOpen(false);
           setSelectedAsset(null);
         }}
       >
         {assetDetails && (
-          <AssetInfo 
-            data={assetDetails} 
+          <AssetInfo
+            data={assetDetails}
             price={priceData}
             isPriceLoading={isPriceLoading}
           />

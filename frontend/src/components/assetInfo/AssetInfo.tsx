@@ -1,5 +1,5 @@
 import type { AssetDetails } from "../../utils/interfaces";
-import './assetInfo.scss';
+import "./assetInfo.scss";
 
 interface AssetInfoProps {
   data: AssetDetails;
@@ -15,11 +15,20 @@ const AssetInfo = ({ data, price, isPriceLoading }: AssetInfoProps) => {
         <span className="asset-symbol">{data.symbol}</span>
       </div>
       <div className="asset-data">
-        <p>Exchange: <strong>{data.exchange ?? 'N/A'}</strong></p>
-        <p>Sector: <strong>{data.sector ?? 'N/A'}</strong></p>
-        <p>Industry: <strong>{data.industry ?? 'N/A'}</strong></p>
         <p>
-          Current Price: <strong>{isPriceLoading ? 'Updating...' : (price != null ? `$${price}` : 'N/A')}</strong>
+          Exchange: <strong>{data.exchange ?? "N/A"}</strong>
+        </p>
+        <p>
+          Sector: <strong>{data.sector ?? "N/A"}</strong>
+        </p>
+        <p>
+          Industry: <strong>{data.industry ?? "N/A"}</strong>
+        </p>
+        <p>
+          Current Price:{" "}
+          <strong>
+            {isPriceLoading ? "Updating..." : price ? `$${price}` : "N/A"}
+          </strong>
         </p>
       </div>
       {data.user_alerts && data.user_alerts.length > 0 && (
@@ -28,8 +37,12 @@ const AssetInfo = ({ data, price, isPriceLoading }: AssetInfoProps) => {
           {data.user_alerts.map((alert) => (
             <div key={alert.id} className="alert-card">
               <p>Condition: {alert.condition}</p>
-              <p>Target: <strong>{alert.target_price}</strong></p>
-              <span className={`status-badge alert-status ${alert.status.toLowerCase()}`}>
+              <p>
+                Target: <strong>{alert.target_price}</strong>
+              </p>
+              <span
+                className={`status-badge alert-status ${alert.status.toLowerCase()}`}
+              >
                 Status: {alert.status}
               </span>
             </div>

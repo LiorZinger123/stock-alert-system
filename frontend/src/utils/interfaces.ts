@@ -4,7 +4,7 @@ export interface LoginFormInputs {
 }
 
 export interface RegisterFormInputs extends LoginFormInputs {
-  email: string
+  email: string;
 }
 
 export type AlertCondition = "above" | "below";
@@ -18,7 +18,7 @@ interface Asset {
   current_price?: number;
 }
 
-export type AlertStatus = "active" | "inactive" | "pending" | "sent" | "failed"
+export type AlertStatus = "active" | "inactive" | "pending" | "sent" | "failed";
 
 export interface Alert {
   id: number;
@@ -40,7 +40,7 @@ export interface NewAlertFormValues {
   asset: SearchedAsset | null;
   targetPrice: string;
   condition: string;
-};
+}
 
 export interface CreateNewAlertData {
   symbol: string;

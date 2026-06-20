@@ -2,11 +2,11 @@ import axios, {
   type AxiosError,
   type AxiosResponse,
   type InternalAxiosRequestConfig,
-} from 'axios';
-import { backendBaseUrl } from '../../utils/constants';
-import { useAuthStore } from '../../store/useAuthStore';
+} from "axios";
+import { backendBaseUrl } from "../../utils/constants";
+import { useAuthStore } from "../../store/useAuthStore";
 
-declare module 'axios' {
+declare module "axios" {
   export interface AxiosRequestConfig {
     skipAuthInterceptor?: boolean;
     _retry?: boolean;
@@ -48,9 +48,12 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (error.response?.status === 401 && originalRequest.url?.includes('/auth/refresh')) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest.url?.includes("/auth/refresh")
+    ) {
       useAuthStore.getState().clearUser();
-      window.location.href = '/login';
+      window.location.href = "/login";
       return Promise.reject(error);
     }
 
@@ -67,7 +70,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await api.post('/auth/refresh');
+        await api.post("/auth/refresh");
         isRefreshing = false;
         processQueue();
         return api(originalRequest);
@@ -75,13 +78,13 @@ api.interceptors.response.use(
         isRefreshing = false;
         processQueue(refreshError as AxiosError);
         useAuthStore.getState().clearUser();
-        window.location.href = '/login';
+        window.location.href = "/login";
         return Promise.reject(refreshError);
       }
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
