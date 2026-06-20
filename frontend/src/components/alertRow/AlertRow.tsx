@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import toast from "react-hot-toast";
 import axios from "axios";
+import toast from "react-hot-toast";
 import UpdateAlertForm from "../updateAlertForm/UpdateAlertForm";
 import { Tooltip } from "@mui/material";
 import { FiEdit2 } from "react-icons/fi";
 import { MdDeleteOutline } from "react-icons/md";
 import type { Alert } from "../../utils/interfaces";
 import { alertStatusMap } from "../../utils/constants";
-import { useDeleteAlert } from "../../services/queries/alertQueries";
 import { useLoadingStore } from "../../store/useLoadingStore";
+import { useDeleteAlert } from "../../services/queries/alertQueries";
 import { CustomDialog, GlassModal } from "../../shared/MuiComponents";
 import "./alertRow.scss";
 
@@ -18,8 +18,8 @@ interface AlertRowProps {
 
 const AlertRow = ({ alert }: AlertRowProps) => {
   const { setIsLoading } = useLoadingStore();
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+  const [openUpdateDialog, setOpenUpdateDialog] = useState<boolean>(false);
 
   const disabledStatuses = [
     alertStatusMap.pending,
@@ -30,7 +30,7 @@ const AlertRow = ({ alert }: AlertRowProps) => {
 
   const { mutate: deleteAlert, isPending: isPendingDelete } = useDeleteAlert();
 
-  const handleDelete = () => {
+  const handleDelete = (): void => {
     if (disabledStatuses.includes(alert.status)) {
       toast.error("This alert cannot be deleted in its current state.");
       return;

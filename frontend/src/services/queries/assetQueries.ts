@@ -17,12 +17,7 @@ export const useAssetSearch = (query: string) => {
 export const useAssetDetails = (symbol?: string, name?: string) => {
   return useQuery({
     queryKey: ["assetDetails", symbol],
-    queryFn: () => {
-      if (!symbol) {
-        throw new Error("Symbol is required");
-      }
-      return getAssetDetails(symbol, name);
-    },
+    queryFn: () => getAssetDetails(symbol!, name),
     enabled: !!symbol,
     staleTime: 1000 * 60 * 60,
   });
@@ -31,12 +26,7 @@ export const useAssetDetails = (symbol?: string, name?: string) => {
 export const useAssetPrice = (symbol?: string, isAssetLoaded?: boolean) => {
   return useQuery({
     queryKey: ["assetPrice", symbol],
-    queryFn: () => {
-      if (!symbol) {
-        throw new Error("Symbol is required");
-      }
-      return getAssetPrice(symbol);
-    },
+    queryFn: () => getAssetPrice(symbol!),
     enabled: !!symbol && !!isAssetLoaded,
     staleTime: 1000 * 30,
     refetchInterval: 1000 * 60,

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface LoadingState {
+export interface LoadingState {
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
 }

@@ -1,15 +1,15 @@
 .asset-info-container {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgb(255 255 255 / 8%);
   border-radius: 16px;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 60%);
   max-height: 60vh;
 
   .asset-header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgb(255 255 255 / 8%);
     padding-bottom: 12px;
 
     h2 { 
@@ -17,9 +17,10 @@
       font-size: 22px; 
       font-weight: 600;
     }
+
     .asset-symbol { 
       font-size: 14px; 
-      color: rgba(255, 255, 255, 0.5); 
+      color: rgb(255 255 255 / 50%); 
       font-family: monospace;
       letter-spacing: 1px;
     }
@@ -33,11 +34,11 @@
     p {
       margin: 0;
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.4);
+      color: rgb(255 255 255 / 40%);
       
       strong {
         display: block;
-        color: #ffffff;
+        color: #fff;
         font-size: 16px;
         margin-top: 4px;
       }
@@ -59,7 +60,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgb(255 255 255 / 10%);
       border-radius: 4px;
     }
 
@@ -67,16 +68,16 @@
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: rgba(255, 255, 255, 0.3);
-      margin: 0 0 5px 0;
+      color: rgb(255 255 255 / 30%);
+      margin: 0 0 5px;
     }
   }
 
   .alert-card {
     padding: 12px;
-    background: rgba(0, 0, 0, 0.3); 
+    background: rgb(0 0 0 / 30%); 
     border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    border: 1px solid rgb(255 255 255 / 4%);
     display: flex;
     justify-content: space-around;
     align-items: center;

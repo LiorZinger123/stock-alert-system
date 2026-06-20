@@ -1,22 +1,27 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type SubmitHandler } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useForm } from "react-hook-form";
 import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { registerSchema } from "../../utils/schemas";
-import { useAuthStore } from "../../store/useAuthStore";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { registerUser } from "../../services/api/authService";
-import { useLoadingStore } from "../../store/useLoadingStore";
 import type { RegisterFormInputs } from "../../utils/interfaces";
+import { useAuthStore, type AuthState } from "../../store/useAuthStore";
+import {
+  useLoadingStore,
+  type LoadingState,
+} from "../../store/useLoadingStore";
 
 const Register = () => {
   const navigate = useNavigate();
-  const setUserId = useAuthStore((state) => state.setUserId);
-  const { isLoading, setIsLoading } = useLoadingStore((state) => state);
-  const [showPass, setShowPass] = useState(false);
+  const setUserId = useAuthStore((state: AuthState) => state.setUserId);
+  const { isLoading, setIsLoading } = useLoadingStore(
+    (state: LoadingState) => state,
+  );
+  const [showPass, setShowPass] = useState<boolean>(false);
 
   const {
     register,
@@ -27,9 +32,7 @@ const Register = () => {
     mode: "onChange",
   });
 
-  const onSubmit: SubmitHandler<RegisterFormInputs> = async (
-    data: RegisterFormInputs,
-  ) => {
+  const onSubmit = async (data: RegisterFormInputs): Promise<void> => {
     try {
       setIsLoading(true);
       const userId = await registerUser(data);

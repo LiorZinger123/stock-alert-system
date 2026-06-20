@@ -1,16 +1,19 @@
 import { useEffect } from "react";
 import api from "../services/api/api";
-import { useAuthStore } from "../store/useAuthStore";
-import { useLoadingStore } from "../store/useLoadingStore";
+import { localStorageManualLogout } from "../utils/constants";
+import { useAuthStore, type AuthState } from "../store/useAuthStore";
+import { useLoadingStore, type LoadingState } from "../store/useLoadingStore";
 
 export const useAuthInitializer = () => {
-  const setUserId = useAuthStore((state) => state.setUserId);
-  const setIsLoading = useLoadingStore((state) => state.setIsLoading);
+  const setUserId = useAuthStore((state: AuthState) => state.setUserId);
+  const setIsLoading = useLoadingStore(
+    (state: LoadingState) => state.setIsLoading,
+  );
 
   useEffect(() => {
     const initAuth = async () => {
       const isManuallyLoggedOut =
-        localStorage.getItem("auth_manual_logout") === "true";
+        localStorage.getItem(localStorageManualLogout) === "true";
 
       if (isManuallyLoggedOut) {
         setIsLoading(false);

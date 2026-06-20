@@ -16,6 +16,6 @@ export const registerUser = async (
   return res.data?.user_id;
 };
 
-export const logoutUser = () => {
+export const logoutUser = (): Promise<void> => {
   return api.post("/auth/logout");
 };

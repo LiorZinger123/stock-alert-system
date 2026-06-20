@@ -2,13 +2,9 @@ import { useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Controller, useForm } from "react-hook-form";
-import { DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { isDuplicateAlert } from "../../utils/helpers";
-import {
-  useUpdateAlert,
-  useInfiniteAlerts,
-} from "../../services/queries/alertQueries";
 import { useLoadingStore } from "../../store/useLoadingStore";
+import { DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import type { Alert, UpdateAlertFormValues } from "../../utils/interfaces";
 import {
   conditionOptions,
@@ -19,6 +15,10 @@ import {
   CustomSelect,
   CustomTextField,
 } from "../../shared/MuiComponents";
+import {
+  useUpdateAlert,
+  useInfiniteAlerts,
+} from "../../services/queries/alertQueries";
 
 interface UpdateAlertFormProps {
   alert: Alert;
@@ -39,7 +39,7 @@ const UpdateAlertForm = ({ alert, onClose }: UpdateAlertFormProps) => {
 
   const { mutate, isPending } = useUpdateAlert();
 
-  const onSubmit = (data: UpdateAlertFormValues) => {
+  const onSubmit = (data: UpdateAlertFormValues): void => {
     const target_price = Number(data.targetPrice);
     const allAlerts = alerts?.pages.flatMap((page) => page) || [];
 

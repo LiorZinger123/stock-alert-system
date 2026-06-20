@@ -5,11 +5,12 @@ import AlertsList from "../alertsList/AlertsList";
 import AssetSearchBar from "../assetSearchBar/AssetSearchBar";
 import { RiLogoutCircleRLine } from "react-icons/ri";
 import { GlassModal } from "../../shared/MuiComponents";
-import { useAuthStore } from "../../store/useAuthStore";
 import { logoutUser } from "../../services/api/authService";
 import type { SearchedAsset } from "../../utils/interfaces";
 import { useLoadingStore } from "../../store/useLoadingStore";
+import { localStorageManualLogout } from "../../utils/constants";
 import { useInfiniteAlerts } from "../../services/queries/alertQueries";
+import { useAuthStore, type AuthState } from "../../store/useAuthStore";
 import {
   useAssetDetails,
   useAssetPrice,
@@ -19,13 +20,13 @@ import "./dashboard.scss";
 const Dashboard = () => {
   const navigate = useNavigate();
   const { setIsLoading } = useLoadingStore();
-  const { clearUser } = useAuthStore((state) => state);
+  const { clearUser } = useAuthStore((state: AuthState) => state);
   const { status, isFetchingNextPage } = useInfiniteAlerts();
   const [selectedAsset, setSelectedAsset] = useState<SearchedAsset | null>(
     null,
   );
-  const [isAssetDialogOpen, setIsAssetDialogOpen] = useState(false);
-  const dialogOpenedRef = useRef(false);
+  const [isAssetDialogOpen, setIsAssetDialogOpen] = useState<boolean>(false);
+  const dialogOpenedRef = useRef<boolean>(false);
 
   const {
     data: assetDetails,
@@ -38,20 +39,20 @@ const Dashboard = () => {
     isAssetDataSuccess,
   );
 
-  const handleAssetChange = (asset: SearchedAsset | null) => {
+  const handleAssetChange = (asset: SearchedAsset | null): void => {
     setSelectedAsset(asset);
     dialogOpenedRef.current = false;
     if (!asset) setIsAssetDialogOpen(false);
   };
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     try {
       setIsLoading(true);
       await logoutUser();
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
-      localStorage.setItem("auth_manual_logout", "true");
+      localStorage.setItem(localStorageManualLogout, "true");
       clearUser();
       navigate("/login");
       setIsLoading(false);

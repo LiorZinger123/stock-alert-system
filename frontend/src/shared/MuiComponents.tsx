@@ -104,8 +104,8 @@ export const CustomTextField = ({
 interface CustomSelectProps {
   label: string;
   value: string;
-  onChange: (event: SelectChangeEvent<string>) => void;
   options: { label: string; value: string }[];
+  onChange: (event: SelectChangeEvent<string>) => void;
 }
 
 export const CustomSelect = ({
@@ -163,22 +163,16 @@ interface GlassModalProps {
   open: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  maxWidth?: "xs" | "sm" | "md";
 }
 
-export const GlassModal = ({
-  open,
-  onClose,
-  children,
-  maxWidth = "xs",
-}: GlassModalProps) => {
+export const GlassModal = ({ open, onClose, children }: GlassModalProps) => {
   return (
     <Dialog
       open={open}
       onClose={onClose}
       slots={{ transition: Transition }}
       fullWidth
-      maxWidth={maxWidth}
+      maxWidth="xs"
       sx={{
         "& .MuiDialog-paper": {
           background: "rgba(255, 255, 255, 0.1)",

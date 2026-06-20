@@ -31,3 +31,5 @@ export const webSocketMessageTypes: Record<string, string> = {
 
 export const backendBaseUrl = "http://localhost:8000";
 export const wsBaseUrl = backendBaseUrl.replace(/^http/, "ws");
+
+export const localStorageManualLogout = "auth_manual_logout";

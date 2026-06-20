@@ -3,17 +3,17 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Login from "./components/login/Login";
 import Loader from "./components/Loader/Loader";
+import { useWebSocket } from "./hooks/useWebSocket";
 import Register from "./components/register/Register";
 import Dashboard from "./components/dashboard/Dashboard";
-import { useLoadingStore } from "./store/useLoadingStore";
-import "./app.scss";
-import { useWebSocket } from "./hooks/useWebSocket";
 import { useAuthInitializer } from "./hooks/useAuthInitializer";
+import { useLoadingStore, type LoadingState } from "./store/useLoadingStore";
+import "./app.scss";
 
 function App() {
   useAuthInitializer();
   useWebSocket();
-  const isLoading = useLoadingStore((state) => state.isLoading);
+  const isLoading = useLoadingStore((state: LoadingState) => state.isLoading);
 
   return (
     <div className="app">

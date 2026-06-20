@@ -10,7 +10,7 @@ export const useWebSocket = () => {
   useEffect(() => {
     if (!userId) return;
 
-    socket.current = new WebSocket(`${wsBaseUrl}/ws/alerts/${userId}`);
+    socket.current = new WebSocket(`${wsBaseUrl}/ws/${userId}`);
 
     socket.current.onopen = () => {
       console.log("WebSocket Connected!");

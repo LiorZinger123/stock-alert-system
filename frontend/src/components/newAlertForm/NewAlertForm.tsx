@@ -2,24 +2,24 @@ import { useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Controller, useForm } from "react-hook-form";
-import { DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import AssetSearchBar from "../assetSearchBar/AssetSearchBar";
 import { isDuplicateAlert } from "../../utils/helpers";
 import { conditionOptions } from "../../utils/constants";
 import { useLoadingStore } from "../../store/useLoadingStore";
+import { DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import type {
   AlertCondition,
   NewAlertFormValues,
 } from "../../utils/interfaces";
 import {
-  useCreateAlert,
-  useInfiniteAlerts,
-} from "../../services/queries/alertQueries";
-import {
   ActionButton,
   CustomSelect,
   CustomTextField,
 } from "../../shared/MuiComponents";
+import {
+  useCreateAlert,
+  useInfiniteAlerts,
+} from "../../services/queries/alertQueries";
 
 interface NewAlertFormProps {
   onClose: () => void;
@@ -39,11 +39,7 @@ const NewAlertForm = ({ onClose }: NewAlertFormProps) => {
 
   const { mutate, isPending } = useCreateAlert();
 
-  useEffect(() => {
-    setIsLoading(isPending);
-  }, [isPending, setIsLoading]);
-
-  const onSubmit = (data: NewAlertFormValues) => {
+  const onSubmit = (data: NewAlertFormValues): void => {
     if (!data.asset) {
       toast.error("Alert Creation Failed: Asset is required.");
       return;
@@ -86,6 +82,10 @@ const NewAlertForm = ({ onClose }: NewAlertFormProps) => {
       },
     );
   };
+
+  useEffect(() => {
+    setIsLoading(isPending);
+  }, [isPending, setIsLoading]);
 
   return (
     <>

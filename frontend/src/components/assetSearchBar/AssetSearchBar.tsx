@@ -8,10 +8,10 @@ import {
 } from "../../shared/MuiComponents";
 
 interface AssetSearchBarProps {
-  field?: ControllerRenderProps<NewAlertFormValues, "asset">;
-  value?: SearchedAsset | null;
-  onChange?: (value: SearchedAsset | null) => void;
   label?: string;
+  value?: SearchedAsset | null;
+  field?: ControllerRenderProps<NewAlertFormValues, "asset">;
+  onChange?: (value: SearchedAsset | null) => void;
 }
 
 const AssetSearchBar = ({
@@ -20,15 +20,15 @@ const AssetSearchBar = ({
   onChange,
   label,
 }: AssetSearchBarProps) => {
-  const currentValue = field?.value ?? value ?? null;
-  const [inputValue, setInputValue] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const currentValue: SearchedAsset | null = field?.value ?? value ?? null;
+  const [inputValue, setInputValue] = useState<string>("");
+  const [debouncedQuery, setDebouncedQuery] = useState<string>("");
   const { data: assets, isLoading } = useAssetSearch(debouncedQuery);
 
   const handleSelectionChange = (
     _event: React.SyntheticEvent,
     newValue: SearchedAsset | null,
-  ) => {
+  ): void => {
     if (field?.onChange) {
       field.onChange(newValue);
     } else if (onChange) {
@@ -40,7 +40,7 @@ const AssetSearchBar = ({
     _event: React.SyntheticEvent,
     newInputValue: string,
     reason: string,
-  ) => {
+  ): (() => void) | undefined => {
     setInputValue(newInputValue);
 
     if (reason === "clear") {

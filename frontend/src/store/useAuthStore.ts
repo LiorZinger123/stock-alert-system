@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface AuthState {
+export interface AuthState {
   userId: number | null;
   setUserId: (id: number | null) => void;
   clearUser: () => void;

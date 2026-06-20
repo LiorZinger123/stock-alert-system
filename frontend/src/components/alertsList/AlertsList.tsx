@@ -8,12 +8,11 @@ import "./alertsList.scss";
 
 const AlertsList = () => {
   const { setIsLoading } = useLoadingStore();
-  const [openNewAlertDialog, setOpenNewAlertDialog] = useState(false);
-
-  const loadMoreRef = useRef<HTMLDivElement>(null);
-  const alertListRef = useRef<HTMLDivElement>(null);
-  const previousAlertsCountRef = useRef(0);
-  const previousPagesCountRef = useRef(0);
+  const [openNewAlertDialog, setOpenNewAlertDialog] = useState<boolean>(false);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const alertListRef = useRef<HTMLDivElement | null>(null);
+  const previousAlertsCountRef = useRef<number>(0);
+  const previousPagesCountRef = useRef<number>(0);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
     useInfiniteAlerts();

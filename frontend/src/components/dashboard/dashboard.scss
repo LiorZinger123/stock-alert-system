@@ -6,7 +6,7 @@
     align-items: center;
     overflow: hidden;
 
-    @media screen and (max-width: 1024px) {
+    @media screen and (width <= 1024px) {
         width: 100%;
     }
 }
@@ -35,16 +35,16 @@
   gap: 16px;
 
   .MuiOutlinedInput-root {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgb(255 255 255 / 10%);
     backdrop-filter: blur(10px);
     border-radius: 12px;
 
     .MuiOutlinedInput-notchedOutline {
-      border-color: rgba(255, 255, 255, 0.2);
+      border-color: rgb(255 255 255 / 20%);
     }
 
     &:hover .MuiOutlinedInput-notchedOutline {
-      border-color: rgba(255, 255, 255, 0.5);
+      border-color: rgb(255 255 255 / 50%);
     }
 
     &.Mui-focused .MuiOutlinedInput-notchedOutline {
@@ -62,9 +62,9 @@
   top: 10px;
   right: 10px;
   width: 80px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgb(255 255 255 / 20%);
   border-radius: 12px;
   padding: 12px;
   cursor: pointer;
@@ -79,8 +79,8 @@
   }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.5);
+    background: rgb(255 255 255 / 15%);
+    border-color: rgb(255 255 255 / 50%);
   }
 
   &:active {

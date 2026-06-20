@@ -1,12 +1,8 @@
 import "./loader.scss";
 
-interface LoaderProps {
-  ligherBg?: boolean;
-}
-
-const Loader = ({ ligherBg }: LoaderProps) => {
+const Loader = () => {
   return (
-    <div className={`loader-overlay${ligherBg ? " ligher-bg" : ""}`}>
+    <div className="loader-overlay">
       <div className="loader" />
     </div>
   );
