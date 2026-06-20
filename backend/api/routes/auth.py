@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-async def register(payload: RegisterPayload, response: Response, db: AsyncSession = Depends(get_db)) -> dict[str, str]:
+async def register(payload: RegisterPayload, response: Response, db: AsyncSession = Depends(get_db)) -> dict:
     try:
         user_service = UserService(db)
         auth_service = AuthService(auth_cache)
@@ -36,7 +36,10 @@ async def register(payload: RegisterPayload, response: Response, db: AsyncSessio
         access, refresh = await auth_service.login_user(new_user)
         set_tokens_cookies(response, access, refresh, TOKEN_COOKIES_EXPIRE_SECONDS)
         
-        return {"message": "User registered successfully"}
+        return {
+            "message": "User registered successfully",
+            "user_id": new_user.id
+        }
     except HTTPException:
         raise
     except Exception as e:
@@ -48,7 +51,7 @@ async def register(payload: RegisterPayload, response: Response, db: AsyncSessio
 
 
 @router.post("/login", status_code=status.HTTP_200_OK)
-async def login(payload: Credentials, response: Response, db: AsyncSession = Depends(get_db)) -> dict[str, str]:
+async def login(payload: Credentials, response: Response, db: AsyncSession = Depends(get_db)) -> dict:
     try:
         user_service = UserService(db)
         auth_service = AuthService(auth_cache)
@@ -62,7 +65,10 @@ async def login(payload: Credentials, response: Response, db: AsyncSession = Dep
         
         access, refresh = await auth_service.login_user(user)
         set_tokens_cookies(response, access, refresh, TOKEN_COOKIES_EXPIRE_SECONDS)
-        return {"message": "Login successful"}
+        return {
+            "message": "Login successful",
+            "user_id": user.id
+        }
     except HTTPException:
         raise
     except Exception as e:

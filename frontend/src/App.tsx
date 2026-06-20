@@ -7,8 +7,12 @@ import Register from './components/register/Register';
 import Dashboard from './components/dashboard/Dashboard';
 import { useLoadingStore } from './store/useLoadingStore';
 import './app.scss'
+import { useWebSocket } from './hooks/useWebSocket';
+import { useAuthInitializer } from './hooks/useAuthInitializer';
 
 function App() {
+  useAuthInitializer();
+  useWebSocket();
   const isLoading = useLoadingStore((state) => state.isLoading);
 
   return (

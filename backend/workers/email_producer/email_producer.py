@@ -2,6 +2,7 @@ import logging
 import asyncio
 from db.models import Alert
 from helpers.enums import ConditionEnum
+from api.schemas.alerts import AlertStatus
 from ..shared.worker_alert_service import WorkerAlertService
 from ..shared.worker_asset_service import WorkerAssetService
 from services.notification_service import NotificationService
@@ -68,5 +69,6 @@ class EmailProducer:
         return False
 
     async def trigger_notification(self, alert: Alert, current_price: float) -> None:
-        await self.notification_service.queue_notification(alert, current_price)
+        await self.notification_service.send_email_notification(alert, current_price)
         await self.alert_service.mark_alert_as_pending(alert.id, current_price)
+        await self.notification_service.send_alert_status_notification(alert.user_id, alert.id, AlertStatus.PENDING)

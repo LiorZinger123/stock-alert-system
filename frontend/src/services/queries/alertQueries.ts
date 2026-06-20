@@ -1,6 +1,6 @@
-import { useMutation, useInfiniteQuery } from '@tanstack/react-query';
+import { useMutation, useInfiniteQuery, type InfiniteData } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient';
-import type { CreateNewAlertData, UpdateAlertFormData, Alert } from '../../utils/interfaces';
+import type { CreateNewAlertData, UpdateAlertFormData, Alert, AlertStatus } from '../../utils/interfaces';
 import { createNewAlert, deleteUserAlert, fetchAlertsPaginated, updateUserAlert } from '../api/alertsService';
 
 export const alertKeys = {
@@ -33,7 +33,7 @@ export const useUpdateAlert = () => {
     mutationFn: ({ alertId, data }: { alertId: number; data: UpdateAlertFormData }) =>
       updateUserAlert(alertId, data),
     onSuccess: (updatedAlert: Alert) => {
-      queryClient.setQueryData(alertKeys.lists(), (oldData: any) => {
+      queryClient.setQueryData(alertKeys.lists(), (oldData: InfiniteData<Alert[]>) => {
         if (!oldData) return;
         return {
           ...oldData,
@@ -51,7 +51,7 @@ export const useDeleteAlert = () => {
   return useMutation({
     mutationFn: deleteUserAlert,
     onSuccess: (_, alertId: number) => {
-      queryClient.setQueryData(alertKeys.lists(), (oldData: any) => {
+      queryClient.setQueryData(alertKeys.lists(), (oldData: InfiniteData<Alert[]>) => {
         if (!oldData) return;
         return {
           ...oldData,
@@ -62,5 +62,22 @@ export const useDeleteAlert = () => {
       });
       queryClient.invalidateQueries({ queryKey: ['assetDetails'] });
     },
+  });
+};
+
+export const updateAlertInCache = (alertId: number, newStatus: AlertStatus) => {
+  queryClient.setQueryData<InfiniteData<Alert[]>>(alertKeys.lists(), (oldData) => {
+    if (!oldData) return;
+
+    return {
+      ...oldData,
+      pages: oldData.pages.map((page: Alert[]) =>
+        page.map((alert) => 
+          alert.id === alertId 
+            ? { ...alert, status: newStatus }
+            : alert
+        )
+      ),
+    };
   });
 };

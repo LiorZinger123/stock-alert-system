@@ -22,3 +22,10 @@ export const alertStatusMap: Record<AlertStatus, string> = {
   sent: "sent",
   failed: "failed",
 };
+
+export const webSocketMessageTypes: Record<string, string> = {
+  alertStatus: "ALERT_STATUS_UPDATE"
+}
+
+export const backendBaseUrl = "http://localhost:8000"
+export const wsBaseUrl = backendBaseUrl.replace(/^http/, 'ws');

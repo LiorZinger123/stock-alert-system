@@ -1,8 +1,8 @@
 import asyncio
 import logging
 from .email_producer import EmailProducer
+from core.config import settings
 from core.database import AsyncSessionLocal
-from ..shared.worker_config import worker_config
 from ..shared.worker_alert_service import WorkerAlertService
 from ..shared.worker_asset_service import WorkerAssetService
 from services.notification_service import NotificationService
@@ -17,7 +17,7 @@ async def main():
     
     alert_service = WorkerAlertService(AsyncSessionLocal)
     asset_service = WorkerAssetService(AsyncSessionLocal)
-    notification_service = NotificationService(worker_config.RABBITMQ_URL)
+    notification_service = NotificationService(settings.RABBITMQ_URL)
     monitor = EmailProducer(
         alert_service=alert_service,
         asset_service=asset_service,
@@ -30,6 +30,7 @@ async def main():
     except Exception as e:
         logger.error(f"Worker crashed: {e}")
     finally:
+        await notification_service.close()
         logger.info("Worker stopped.")
 
 if __name__ == "__main__":

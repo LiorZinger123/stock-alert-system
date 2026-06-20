@@ -1,12 +1,14 @@
 import api from "./api";
 import type { LoginFormInputs, RegisterFormInputs } from "../../utils/interfaces";
 
-export const login = (data: LoginFormInputs) => {
-    return api.post("/auth/login", data);
+export const login = async (data: LoginFormInputs): Promise<number> => {
+    const res = await api.post("/auth/login", data);
+    return res.data?.user_id;
 };
 
-export const registerUser = (data: RegisterFormInputs) => {
-    return api.post("/auth/register", data);
+export const registerUser = async (data: RegisterFormInputs): Promise<number> => {
+    const res = await api.post("/auth/register", data);
+    return res.data?.user_id;
 }
 
 export const logoutUser = () => {

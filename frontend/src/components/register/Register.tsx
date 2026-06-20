@@ -7,28 +7,31 @@ import toast from "react-hot-toast";
 import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { registerSchema } from "../../utils/schemas";
+import { useAuthStore } from "../../store/useAuthStore";
 import { registerUser } from "../../services/api/authService";
 import { useLoadingStore } from "../../store/useLoadingStore";
 import type { RegisterFormInputs } from "../../utils/interfaces";
 
 const Register = () => {
     const navigate = useNavigate();
+    const setUserId = useAuthStore((state) => state.setUserId)
     const { isLoading, setIsLoading } = useLoadingStore((state) => state);
     const [showPass, setShowPass] = useState(false);
     
     const {
         register,
         handleSubmit,
-        formState: { errors, touchedFields }
+        formState: { errors }
     } = useForm<RegisterFormInputs>({
         resolver: zodResolver(registerSchema),
-        mode: "onBlur",
+        mode: "onChange",
     });
 
     const onSubmit: SubmitHandler<RegisterFormInputs> = async (data: RegisterFormInputs) => {
         try {
             setIsLoading(true);
-            await registerUser(data);
+            const userId = await registerUser(data);
+            setUserId(userId);
             navigate("/dashboard");
         } catch (err: unknown) {
             setIsLoading(false);
@@ -61,7 +64,7 @@ const Register = () => {
                         {...register("username")} 
                     />
                     <label htmlFor="username">Username</label>
-                    {touchedFields.username && errors.username && (
+                    {errors.username && (
                         <span className="login-register-error-message">{errors.username.message}</span>
                     )}
                 </div>
@@ -78,7 +81,7 @@ const Register = () => {
                     ) : (
                         <IoEyeOff className="eye-icon" onClick={() => setShowPass(false)} />
                     )}
-                    {touchedFields.password && errors.password && (
+                    {errors.password && (
                         <span className="login-register-error-message">{errors.password.message}</span>
                     )}
                 </div>
@@ -91,7 +94,7 @@ const Register = () => {
                         {...register("email")} 
                     />
                     <label htmlFor='email'>Email</label>
-                    {touchedFields.email && errors.email && (
+                    {errors.email && (
                         <span className="login-register-error-message">{errors.email.message}</span>
                     )}
                 </div>

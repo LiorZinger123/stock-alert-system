@@ -18,9 +18,17 @@ class Settings(BaseSettings):
     
     REDIS_HOST: str = "localhost"
 
+    RABBITMQ_DEFAULT_USER: str = "guest"
+    RABBITMQ_DEFAULT_PASS: str = "guest"
+
     @property
     def DATABASE_URL(self) -> str:
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:5432/{self.DB_NAME}"
+    
+    @property
+    def RABBITMQ_URL(self) -> str:
+        return f"amqp://{self.RABBITMQ_DEFAULT_USER}:{self.RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/"
+
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",

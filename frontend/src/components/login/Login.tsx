@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm, type SubmitHandler } from "react-hook-form";
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import api from '../../services/api/api';
 import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { login } from "../../services/api/authService";
+import { useAuthStore } from '../../store/useAuthStore';
 import type { LoginFormInputs } from "../../utils/interfaces";
 import { useLoadingStore } from '../../store/useLoadingStore';
 
 const Login = () => {
     const navigate = useNavigate();
+    const setUserId = useAuthStore((state) => state.setUserId)
     const { isLoading, setIsLoading } = useLoadingStore((state) => state);
     const { register, handleSubmit } = useForm<LoginFormInputs>();
     const [showPass, setShowPass] = useState(false);
@@ -19,7 +20,8 @@ const Login = () => {
    const onSubmit: SubmitHandler<LoginFormInputs> = async (data: LoginFormInputs) => {
         try {
             setIsLoading(true);
-            await login(data);
+            const userId = await login(data);
+            setUserId(userId)
             navigate("/dashboard");
         } catch (err: unknown) {
             setIsLoading(false);
@@ -39,30 +41,6 @@ const Login = () => {
             localStorage.removeItem('auth_manual_logout');
         }
     };
-
-    useEffect(() => {
-        const checkAuth = async () => {
-            const isManuallyLoggedOut = localStorage.getItem('auth_manual_logout') === 'true';
-
-            if (isManuallyLoggedOut) {
-                console.log("User manually logged out; skipping auto-login.");
-                return;
-            }
-
-            try {
-                await api.get("/me", { 
-                    withCredentials: true,
-                    skipAuthInterceptor: true 
-                });
-
-                navigate("/dashboard");
-            } catch {
-                console.log("User not logged in");
-            }
-        };
-
-        checkAuth();
-    }, [navigate]);
 
     return (
         <div className='login-register-container'>

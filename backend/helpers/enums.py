@@ -12,3 +12,7 @@ class AlertStatus(str, Enum):
     PENDING = "pending"
     SENT = "sent"
     FAILED = "failed"
+
+
+class QueueNotificationPayloadTypes(str, Enum):
+    ALERT_STATUS = "ALERT_STATUS_UPDATE"
