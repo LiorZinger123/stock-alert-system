@@ -1,4 +1,5 @@
 .alert-row {
+  width: 90%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -11,18 +12,18 @@
   transition: all 0.3s ease;
   backdrop-filter: blur(5px);
   gap: 20px;
-
-  @media screen and (min-width: $tablet-screen-size) {
-    width: 90%;
-  }
-
-  @media screen and (min-width: $big-mobile-screen-size) and (max-width: $tablet-screen-size) {
-    width: 80%;
+  
+  @media screen and (max-width: $tablet-screen-size) {
+    gap: 14px;
   }
 
   @media screen and (max-width: $big-mobile-screen-size) {
-    padding: 0 14px;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    height: auto;
+    min-height: 70px;
+    padding: 10px 14px;
   }
 
   &:hover {
@@ -54,23 +55,33 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-}
+  }
 
-  .alert-trigger {
-    font-weight: 500;
-    font-size: 15px;
-    flex: 1;
-    max-width: 150px;
-    white-space: nowrap;
+  .alert-trigger,
+  .alert-current-price {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
 
-    @media screen and (max-width: $tablet-screen-size) {
-      white-space: wrap;
+    .label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #cccccc;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .price-value {
-      color: #70f3ff;
-      margin-left: 8px;
-      font-weight: 700;
+      font-weight: 600;
+      font-size: 14px;
+      color: #ffffff;
+    }
+  }
+
+  .alert-trigger {
+    .price-value {
+      color: #00e5ff;
     }
   }
 
@@ -80,7 +91,6 @@
     flex-shrink: 0;
 
     @media screen and (max-width: $tablet-screen-size) {
-      flex-direction: column;
       gap: 6px;
     }
 

@@ -15,7 +15,7 @@ interface Asset {
   sector?: string;
   industry?: string;
   exchange?: string;
-  current_price?: number;
+  price?: number;
 }
 
 export type AlertStatus = "active" | "inactive" | "pending" | "sent" | "failed";

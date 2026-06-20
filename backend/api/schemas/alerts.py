@@ -14,7 +14,6 @@ class AlertReadSchema(BaseModel):
     created_at: Optional[datetime] = None
     triggered_at: Optional[datetime] = None
     triggered_price: Optional[float] = Field(default=None, exclude=None)
-    current_price: Optional[float] = None
     asset: AssetSchema      
     
     model_config = ConfigDict(from_attributes=True)

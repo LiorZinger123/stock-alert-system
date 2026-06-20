@@ -76,8 +76,12 @@ const AlertRow = ({ alert }: AlertRowProps) => {
           </div>
         </Tooltip>
         <div className="alert-trigger">
-          <span>Trigger {alert.condition === "above" ? ">" : "<"}=</span>
-          <span className="price-value">${alert.target_price}</span>
+          <span className="label">Trigger</span>
+          <span className="price-value">{alert.condition === "above" ? ">" : "<"}= {alert.target_price}$</span>
+        </div>
+        <div className="alert-current-price">
+          <span className="label">Current</span>
+          <span className="price-value">{alert.asset.price}$</span>
         </div>
         <div className={`alert-status ${alert.status}`}>
           {alert.status.toUpperCase()}
