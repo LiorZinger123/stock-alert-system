@@ -1,9 +1,10 @@
 import json
 import aio_pika
+from typing import Optional
 from db.models import Alert
 from api.schemas.alerts import AlertStatus
 from helpers.enums import QueueNotificationPayloadTypes
-from helpers.constants import EMAIL_NOTIFICATION_QUEUE_NAME, ALERT_STATUS_NOTIFICATION_QUEUE_NAME
+from helpers.constants import EMAIL_NOTIFICATION_QUEUE_NAME, ALERT_STATUS_NOTIFICATION_QUEUE_NAME, PRICE_CHANGE_QUEUE_NAME
 
 
 class NotificationService:
@@ -11,6 +12,7 @@ class NotificationService:
         self.amqp_url = amqp_url
         self.email_queue_name = EMAIL_NOTIFICATION_QUEUE_NAME
         self.alert_status_queue_name = ALERT_STATUS_NOTIFICATION_QUEUE_NAME
+        self.price_change_queue_name = PRICE_CHANGE_QUEUE_NAME
         self.connection = None
         self.channel = None
 
@@ -50,14 +52,26 @@ class NotificationService:
         }
         await self.queue_notification(self.email_queue_name, email_payload)
 
-    async def send_alert_status_notification(self, user_id: int, alert_id: int, status: AlertStatus) -> None:
+    async def send_alert_status_notification(self, user_id: int, alert_id: int, status: AlertStatus, price: Optional[float]) -> None:
         alert_status_payload = {
             "type": QueueNotificationPayloadTypes.ALERT_STATUS.value,
             "data": {
                 "user_id": user_id,
                 "alert_id": alert_id,
-                "status": status.value
+                "status": status.value,
+                "triggered_price": price
             }
         }
 
         await self.queue_notification(self.alert_status_queue_name, alert_status_payload)
+
+    async def send_price_change_notification(self, user_id: int, payload: dict[int, float]) -> None:
+        price_change_payload = {
+            "type": QueueNotificationPayloadTypes.PRICE_CHANGE.value,
+            "data": {
+                "user_id": user_id,
+                **payload
+            }
+        }
+
+        await self.queue_notification(self.price_change_queue_name, price_change_payload)

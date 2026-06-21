@@ -20,6 +20,13 @@ const AlertRow = ({ alert }: AlertRowProps) => {
   const { setIsLoading } = useLoadingStore();
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [openUpdateDialog, setOpenUpdateDialog] = useState<boolean>(false);
+  const [isFlashing, setIsFlashing] = useState(false);
+
+  useEffect(() => {
+    setIsFlashing(true);
+    const timer = setTimeout(() => setIsFlashing(false), 1500);
+    return () => clearTimeout(timer);
+  }, [alert.triggered_price, alert.status]);
 
   const disabledStatuses = [
     alertStatusMap.pending,
@@ -44,7 +51,6 @@ const AlertRow = ({ alert }: AlertRowProps) => {
       onError: (error) => {
         if (axios.isAxiosError(error) && error.response) {
           const status = error.response.status;
-
           if (status === 409) {
             toast.error("This alert cannot be deleted in its current state.");
           } else if (status === 423) {
@@ -65,7 +71,7 @@ const AlertRow = ({ alert }: AlertRowProps) => {
 
   return (
     <>
-      <div className="alert-row">
+      <div className={`alert-row ${isFlashing ? "flash-effect" : ""}`}>
         <Tooltip
           title={`${alert.asset.symbol.toUpperCase()} - ${alert.asset.name}`}
           arrow
@@ -79,11 +85,15 @@ const AlertRow = ({ alert }: AlertRowProps) => {
           <span className="label">Trigger</span>
           <span className="price-value">{alert.condition === "above" ? ">" : "<"}= {alert.target_price}$</span>
         </div>
-        <div className="alert-current-price">
-          <span className="label">Current</span>
-          <span className="price-value">{alert.asset.price}$</span>
-        </div>
-        <div className={`alert-status ${alert.status}`}>
+        {alert.status !== alertStatusMap.inactive &&
+          <div className="alert-current-triggered-price">
+            <span className="label">{!!alert.triggered_price ? "Triggered" : "Current"} Price</span>
+            <span className={`price-value ${isFlashing ? "flash-effect" : ""}`}>
+              {alert.triggered_price ?? alert.asset.price}$
+            </span>
+          </div>  
+        }
+        <div className={`alert-status ${alert.status} ${isFlashing ? "flash-effect" : ""}`}>
           {alert.status.toUpperCase()}
         </div>
         <div className="alert-row-actions">

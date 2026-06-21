@@ -5,6 +5,7 @@ import yfinance as yf
 from services.cache_managers import MarketCache
 from ..shared.worker_alert_service import WorkerAlertService
 from ..shared.worker_asset_service import WorkerAssetService
+from services.notification_service import NotificationService
 
 
 logger = logging.getLogger(__name__)
@@ -16,10 +17,12 @@ class PriceMonitor:
             market_cache: MarketCache,
             alert_service: WorkerAlertService,
             asset_service: WorkerAssetService,
+            notification_service: NotificationService
         ):
         self.market_cache = market_cache
         self.alert_service = alert_service
         self.asset_service = asset_service
+        self.notification_service = notification_service
 
     async def run_loop(self, interval: int = 60) -> None:
         logger.info("PriceMonitor started...")
@@ -66,8 +69,11 @@ class PriceMonitor:
             
             formatted_updates = {f"stock:price:{s}": p for s, p in updates_needed.items()}
             await self.market_cache.set_prices(formatted_updates)
-            
             await self.asset_service.bulk_update_prices(updates_needed)
+
+            user_price_updates = await self.alert_service.get_user_alert_price_map(updates_needed)
+            for user_id, web_socket_payload in user_price_updates.items():
+                await self.notification_service.send_price_change_notification(user_id, web_socket_payload)
         else:
             logger.info("No price changes detected. Systems are up to date.")
 

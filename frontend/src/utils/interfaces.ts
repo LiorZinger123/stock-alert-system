@@ -9,13 +9,13 @@ export interface RegisterFormInputs extends LoginFormInputs {
 
 export type AlertCondition = "above" | "below";
 
-interface Asset {
+export interface Asset {
   symbol: string;
-  name?: string;
-  sector?: string;
-  industry?: string;
-  exchange?: string;
-  price?: number;
+  name?: string | null;
+  sector?: string | null;
+  industry?: string | null;
+  exchange?: string | null;
+  price?: number | null; 
 }
 
 export type AlertStatus = "active" | "inactive" | "pending" | "sent" | "failed";
@@ -27,8 +27,8 @@ export interface Alert {
   status: AlertStatus;
   asset: Asset;
   created_at?: Date;
-  triggered_at?: Date;
-  triggered_price?: number;
+  triggered_at?: Date | null;
+  triggered_price?: number | null;
 }
 
 export interface SearchedAsset {

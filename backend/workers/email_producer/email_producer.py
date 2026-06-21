@@ -71,4 +71,4 @@ class EmailProducer:
     async def trigger_notification(self, alert: Alert, current_price: float) -> None:
         await self.notification_service.send_email_notification(alert, current_price)
         await self.alert_service.mark_alert_as_pending(alert.id, current_price)
-        await self.notification_service.send_alert_status_notification(alert.user_id, alert.id, AlertStatus.PENDING)
+        await self.notification_service.send_alert_status_notification(alert.user_id, alert.id, AlertStatus.PENDING, current_price)
