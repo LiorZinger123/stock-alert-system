@@ -15,7 +15,7 @@ export interface Asset {
   sector?: string | null;
   industry?: string | null;
   exchange?: string | null;
-  price?: number | null; 
+  price?: number | null;
 }
 
 export type AlertStatus = "active" | "inactive" | "pending" | "sent" | "failed";

@@ -83,17 +83,23 @@ const AlertRow = ({ alert }: AlertRowProps) => {
         </Tooltip>
         <div className="alert-trigger">
           <span className="label">Trigger</span>
-          <span className="price-value">{alert.condition === "above" ? ">" : "<"}= {alert.target_price}$</span>
+          <span className="price-value">
+            {alert.condition === "above" ? ">" : "<"}= {alert.target_price}$
+          </span>
         </div>
-        {alert.status !== alertStatusMap.inactive &&
+        {alert.status !== alertStatusMap.inactive && (
           <div className="alert-current-triggered-price">
-            <span className="label">{!!alert.triggered_price ? "Triggered" : "Current"} Price</span>
+            <span className="label">
+              {alert.triggered_price ? "Triggered" : "Current"} Price
+            </span>
             <span className={`price-value ${isFlashing ? "flash-effect" : ""}`}>
               {alert.triggered_price ?? alert.asset.price}$
             </span>
-          </div>  
-        }
-        <div className={`alert-status ${alert.status} ${isFlashing ? "flash-effect" : ""}`}>
+          </div>
+        )}
+        <div
+          className={`alert-status ${alert.status} ${isFlashing ? "flash-effect" : ""}`}
+        >
           {alert.status.toUpperCase()}
         </div>
         <div className="alert-row-actions">

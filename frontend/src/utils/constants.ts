@@ -27,7 +27,7 @@ export const alertStatusMap: Record<AlertStatus, string> = {
 
 export const webSocketMessageTypes: Record<string, string> = {
   alertStatus: "ALERT_STATUS_UPDATE",
-  priceChange: "PRICE_CHANGE_UPDATE" 
+  priceChange: "PRICE_CHANGE_UPDATE",
 };
 
 export const backendBaseUrl = "http://localhost:8000";

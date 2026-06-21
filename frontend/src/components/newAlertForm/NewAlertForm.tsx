@@ -112,7 +112,10 @@ const NewAlertForm = ({ onClose }: NewAlertFormProps) => {
               required: "Target price is required",
               validate: (v) => {
                 const isValid = /^\d+(\.\d{1,2})?$/.test(String(v));
-                return isValid || "Value must be a valid number with up to 2 decimal places";
+                return (
+                  isValid ||
+                  "Value must be a valid number with up to 2 decimal places"
+                );
               },
             }}
             render={({ field, fieldState }) => (

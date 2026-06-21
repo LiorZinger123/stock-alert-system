@@ -1,7 +1,10 @@
 import { useEffect, useRef } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { webSocketMessageTypes, wsBaseUrl } from "../utils/constants";
-import { updateAlertInCache, updatePriceInCache } from "../services/queries/alertQueries";
+import {
+  updateAlertInCache,
+  updatePriceInCache,
+} from "../services/queries/alertQueries";
 
 export const useWebSocket = () => {
   const { userId } = useAuthStore();
@@ -22,7 +25,11 @@ export const useWebSocket = () => {
 
         switch (type) {
           case webSocketMessageTypes.alertStatus:
-            updateAlertInCache(data.alert_id, data.status, data?.triggered_price);
+            updateAlertInCache(
+              data.alert_id,
+              data.status,
+              data?.triggered_price,
+            );
             break;
           case webSocketMessageTypes.priceChange:
             updatePriceInCache(data);

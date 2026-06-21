@@ -92,7 +92,11 @@ export const useDeleteAlert = () => {
   });
 };
 
-export const updateAlertInCache = (alertId: number, newStatus: AlertStatus, price?: number | null) => {
+export const updateAlertInCache = (
+  alertId: number,
+  newStatus: AlertStatus,
+  price?: number | null,
+) => {
   queryClient.setQueryData<InfiniteData<Alert[]>>(
     alertKeys.lists(),
     (oldData) => {
@@ -102,12 +106,12 @@ export const updateAlertInCache = (alertId: number, newStatus: AlertStatus, pric
         ...oldData,
         pages: oldData.pages.map((page: Alert[]) =>
           page.map((alert) =>
-            alert.id === alertId 
-              ? { 
-                  ...alert, 
-                  status: newStatus, 
+            alert.id === alertId
+              ? {
+                  ...alert,
+                  status: newStatus,
                   triggered_price: price ?? alert.triggered_price,
-                } 
+                }
               : alert,
           ),
         ),
@@ -127,12 +131,12 @@ export const updatePriceInCache = (priceUpdates: Record<number, number>) => {
         pages: oldData.pages.map((page: Alert[]) =>
           page.map((alert) => {
             const newPrice = priceUpdates[alert.id];
-            return newPrice !== undefined 
-              ? { ...alert, current_price: newPrice } 
+            return newPrice !== undefined
+              ? { ...alert, current_price: newPrice }
               : alert;
-          })
+          }),
         ),
       };
-    }
+    },
   );
 };
