@@ -52,7 +52,7 @@ class NotificationService:
         }
         await self.queue_notification(self.email_queue_name, email_payload)
 
-    async def send_alert_status_notification(self, user_id: int, alert_id: int, status: AlertStatus, price: Optional[float]) -> None:
+    async def send_alert_status_notification(self, user_id: int, alert_id: int, status: AlertStatus, price: Optional[float] = None) -> None:
         alert_status_payload = {
             "type": QueueNotificationPayloadTypes.ALERT_STATUS.value,
             "data": {
