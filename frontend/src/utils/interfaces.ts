@@ -3,10 +3,6 @@ export interface LoginFormInputs {
   password: string;
 }
 
-export interface RegisterFormInputs extends LoginFormInputs {
-  email: string;
-}
-
 export type AlertCondition = "above" | "below";
 
 export interface Asset {

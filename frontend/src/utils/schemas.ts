@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const registerSchema = z.object({
   username: z.string().min(3, "Username must contain at least 3 characters"),
-  email: z.email({ error: "Invalid email address" }),
+  email: z.string().email("Invalid email address"),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters long")
@@ -10,4 +10,4 @@ export const registerSchema = z.object({
     .regex(/[0-9]/, "Password must contain at least one number"),
 });
 
-export type LoginFormInputs = z.infer<typeof registerSchema>;
+export type RegisterFormInputs = z.infer<typeof registerSchema>;

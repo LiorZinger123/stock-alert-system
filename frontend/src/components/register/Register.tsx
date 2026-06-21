@@ -8,7 +8,7 @@ import { IoEyeOff } from "react-icons/io5";
 import { registerSchema } from "../../utils/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerUser } from "../../services/api/authService";
-import type { RegisterFormInputs } from "../../utils/interfaces";
+import type { RegisterFormInputs } from "../../utils/schemas";
 import { useAuthStore, type AuthState } from "../../store/useAuthStore";
 import {
   useLoadingStore,

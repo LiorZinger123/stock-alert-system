@@ -1,8 +1,6 @@
 import api from "./api";
-import type {
-  LoginFormInputs,
-  RegisterFormInputs,
-} from "../../utils/interfaces";
+import type { LoginFormInputs } from "../../utils/interfaces";
+import type { RegisterFormInputs } from "../../utils/schemas";
 
 export const login = async (data: LoginFormInputs): Promise<number> => {
   const res = await api.post("/auth/login", data);
