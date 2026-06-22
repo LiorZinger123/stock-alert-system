@@ -1,73 +1,34 @@
-# React + TypeScript + Vite
+# Frontend Documentation - Stock-Alert-System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This document provides a comprehensive overview of the frontend architecture for the Stock-Alert-System.
 
-Currently, two official plugins are available:
+## 1. Overview
+The frontend serves as the interactive client layer for the system. It is engineered to maintain bidirectional communication with the backend, offering a highly responsive dashboard for market monitoring and real-time notification handling.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 2. Technical Architecture & Stack
+* **Core Framework**: Built using **React 19** and **Vite** for optimized development and production builds.
+* **State Management**: Uses **Zustand** for lightweight global state and **TanStack React Query** for efficient server-state management.
+* **Styling & UI**: Utilizes **Material UI (MUI)** with Emotion and **Sass** for styling.
+* **Forms & Validation**: Implements **React Hook Form** with Zod/resolvers for robust form handling.
+* **Communication**: **Axios** is used for RESTful API calls, supplemented by WebSocket integration for real-time updates.
+* **Code Quality**: Enforced via **ESLint** (with React Compiler integration) and **Stylelint** (for SCSS).
 
-## React Compiler
+## 3. Key Features
+* **Real-Time Dashboards**: Interactive visualizations for live stock tracking.
+* **Alert Management**: Comprehensive interface for defining, editing, and deleting alert triggers.
+* **Notification Feed**: A centralized, reactive feed for backend-pushed updates.
+* **Form Logic**: Optimized, validated form submissions across the application.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 4. Development Setup
 
-## Expanding the ESLint configuration
+### Prerequisites
+* Ensure **Node.js** is installed on your machine (LTS version recommended).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Running the Application
+Use the following commands to initialize the development environment:
+* **Install Dependencies**: `npm install`
+* **Start Development Server**: `npm run dev`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 5. Maintenance & Quality
+* **Linting**: Run `npm run lint` to check for code quality issues or `npm run lint:fix` to automatically fix formatting and linting errors.
+* **Production Build**: Run `npm run build` to compile the TypeScript code and generate optimized production assets.
