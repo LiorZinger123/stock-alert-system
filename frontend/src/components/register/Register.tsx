@@ -29,7 +29,7 @@ const Register = () => {
     formState: { errors },
   } = useForm<RegisterFormInputs>({
     resolver: zodResolver(registerSchema),
-    mode: "onChange",
+    mode: "onBlur",
   });
 
   const onSubmit = async (data: RegisterFormInputs): Promise<void> => {
