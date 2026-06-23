@@ -14,7 +14,7 @@ import {
   useLoadingStore,
   type LoadingState,
 } from "../../store/useLoadingStore";
-import './login.scss'
+import "./login.scss";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -100,7 +100,11 @@ const Login = () => {
           >
             Log in
           </button>
-          <button type="button" className="google-login-btn" onClick={() => googleLoginPopup()}>
+          <button
+            type="button"
+            className="google-login-btn"
+            onClick={() => googleLoginPopup()}
+          >
             <img src="/google-icon.jpg" alt="Google" />
             Sign in with Google
           </button>
