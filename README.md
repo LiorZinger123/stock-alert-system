@@ -48,4 +48,7 @@ The command `Remove-Item -Path . ackend\migrations ersions\* -Filter "*.py" -Exc
 **You do not need this command under normal circumstances.** You should only use it if you are in the early development phase and decide to completely restructure your database models and need to restart your migration history from scratch. Using this in a production or stable development environment will cause synchronization issues between your code and your database schema.
 
 ## Documentation
-For a detailed breakdown of the backend components, data flows, and technology stack, see [README_BACKEND.md](backend/README_BACKEND.md).
+- **Backend**: For a detailed breakdown of the backend components, data flows, and technology stack,
+see [backend/README_BACKEND.md](backend/README_BACKEND.md).
+- **Frontend**: For an overview of the React architecture, state management, and setup,
+see [frontend/README_FRONTEND.md](frontend/README_FRONTEND.md).
