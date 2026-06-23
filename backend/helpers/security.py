@@ -6,7 +6,7 @@ from jwt.types import Options
 from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException, status, Response, Request
 from core.config import settings
-from .constants import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS, TOKEN_COOKIES_EXPIRE_SECONDS
+from .constants import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS
 
 
 def set_tokens_cookies(
