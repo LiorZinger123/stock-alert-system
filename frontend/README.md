@@ -29,6 +29,11 @@ Use the following commands to initialize the development environment:
 * **Install Dependencies**: `npm install`
 * **Start Development Server**: `npm run dev`
 
-## 5. Maintenance & Quality
+## 5. Configuration
+To run the frontend, you must configure your environment variables. 
+1. Copy the provided example file: `cp .env.example .env`
+2. Open the newly created `.env` file and populate it with your specific service credentials (e.g., API URLs, OAuth client IDs).
+
+## 6. Maintenance & Quality
 * **Linting**: Run `npm run lint` to check for code quality issues or `npm run lint:fix` to automatically fix formatting and linting errors.
 * **Production Build**: Run `npm run build` to compile the TypeScript code and generate optimized production assets.
