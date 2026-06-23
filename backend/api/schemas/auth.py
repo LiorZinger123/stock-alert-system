@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
-class Credentials(BaseModel):
+class LoginCredentials(BaseModel):
     username: str
     password: str
     
@@ -18,3 +18,7 @@ class RegisterPayload(BaseModel):
         if not any(c.isdigit() for c in v):
             raise ValueError('Password must contain at least one number')
         return v
+
+
+class GoogleAuthRequest(BaseModel):
+    token: str

@@ -30,7 +30,7 @@ export const webSocketMessageTypes: Record<string, string> = {
   priceChange: "PRICE_CHANGE_UPDATE",
 };
 
-export const backendBaseUrl = "http://localhost:8000";
+export const backendBaseUrl = import.meta.env.VITE_BACKEND_URL
 export const wsBaseUrl = backendBaseUrl.replace(/^http/, "ws");
 
 export const localStorageManualLogout = "auth_manual_logout";

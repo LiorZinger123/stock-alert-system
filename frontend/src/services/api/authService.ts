@@ -7,6 +7,11 @@ export const login = async (data: LoginFormInputs): Promise<number> => {
   return res.data?.user_id;
 };
 
+export const googleLogin = async (token?: string): Promise<number> => {
+  const res = await api.post("/auth/google", { token }, { skipAuthInterceptor: true });
+  return res.data?.user_id;
+}
+
 export const registerUser = async (
   data: RegisterFormInputs,
 ): Promise<number> => {

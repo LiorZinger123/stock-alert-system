@@ -6,7 +6,6 @@ from jwt.types import Options
 from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException, status, Response, Request
 from core.config import settings
-from services.container import auth_cache
 from .constants import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS, TOKEN_COOKIES_EXPIRE_SECONDS
 
 
@@ -67,7 +66,10 @@ def hash_password(password: str) -> str:
     return hashed_bytes.decode('utf-8')
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
+def verify_password(plain_password: str, hashed_password: Optional[str] = None) -> bool:
+    if not hashed_password:
+        return False
+
     plain_bytes = plain_password.encode('utf-8')
     hashed_bytes = hashed_password.encode('utf-8')
     return bcrypt.checkpw(plain_bytes, hashed_bytes)
@@ -119,36 +121,3 @@ def decode_token(token: str, options: Optional[Options] = None) -> dict:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid refresh token."
         )
-
-
-def verify_access_jti_match(lior_access_token: str | None, refresh_jti: str) -> None:
-    if not lior_access_token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail="Access token missing for verification."
-        )
-    try:
-        access_payload = decode_token(lior_access_token, {"verify_exp": False})
-        expected_refresh_jti = access_payload.get("jti")
-    except jwt.PyJWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail="Invalid access token structure."
-        )
-
-    if refresh_jti != expected_refresh_jti:
-        print(f"Security Alert: JTI mismatch! Refresh: {refresh_jti}, Access expected: {expected_refresh_jti}")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail="Token reuse or invalid session detected."
-        )
-    
-
-async def handle_new_tokens_generation(response: Response, user_id: int, username: str) -> tuple[str, str]:
-    new_access_token, new_refresh_token = create_tokens(user_id, username)
-    data = {
-        "status": "active"
-    }
-    await auth_cache.save_token(new_refresh_token, data, TOKEN_COOKIES_EXPIRE_SECONDS)
-    set_tokens_cookies(response, new_access_token, new_refresh_token, TOKEN_COOKIES_EXPIRE_SECONDS)
-    return new_access_token, new_refresh_token

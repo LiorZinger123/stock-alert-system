@@ -5,9 +5,7 @@ from core.database import get_db
 from services.container import auth_cache
 from services.auth_service import AuthService
 from services.user_service import UserService
-from api.schemas.auth import RegisterPayload, Credentials
-from helpers.constants import TOKEN_COOKIES_EXPIRE_SECONDS
-from helpers.security import hash_password, verify_password, set_tokens_cookies, decode_token
+from api.schemas.auth import RegisterPayload, LoginCredentials, GoogleAuthRequest
 
 
 router = APIRouter()
@@ -18,27 +16,13 @@ logger = logging.getLogger(__name__)
 async def register(payload: RegisterPayload, response: Response, db: AsyncSession = Depends(get_db)) -> dict:
     try:
         user_service = UserService(db)
-        auth_service = AuthService(auth_cache)
+        auth_service = AuthService(auth_cache, user_service)
         
-        if await user_service.get_user_by_username(payload.username):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username already taken"
-            )
-        
-        if await user_service.get_user_by_email(payload.email):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email already registered"
-            )
-        
-        new_user = await user_service.create_user(payload, hash_password(payload.password))
-        access, refresh = await auth_service.login_user(new_user)
-        set_tokens_cookies(response, access, refresh, TOKEN_COOKIES_EXPIRE_SECONDS)
+        new_user_id = await auth_service.register_user(payload, response)
         
         return {
             "message": "User registered successfully",
-            "user_id": new_user.id
+            "user_id": new_user_id
         }
     except HTTPException:
         raise
@@ -51,23 +35,16 @@ async def register(payload: RegisterPayload, response: Response, db: AsyncSessio
 
 
 @router.post("/login", status_code=status.HTTP_200_OK)
-async def login(payload: Credentials, response: Response, db: AsyncSession = Depends(get_db)) -> dict:
+async def login(payload: LoginCredentials, response: Response, db: AsyncSession = Depends(get_db)) -> dict:
     try:
         user_service = UserService(db)
-        auth_service = AuthService(auth_cache)
-        user = await user_service.get_user_by_username(payload.username)
+        auth_service = AuthService(auth_cache, user_service)
+       
+        user_id = await auth_service.login_user(payload, response)
 
-        if not user or not verify_password(payload.password, user.password):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid credentials"
-            )
-        
-        access, refresh = await auth_service.login_user(user)
-        set_tokens_cookies(response, access, refresh, TOKEN_COOKIES_EXPIRE_SECONDS)
         return {
             "message": "Login successful",
-            "user_id": user.id
+            "user_id": user_id
         }
     except HTTPException:
         raise
@@ -101,27 +78,44 @@ async def refresh(response: Response,
         raise HTTPException(status_code=401, detail="Missing refresh token")
     
     try:
-        payload = decode_token(lior_refresh_token)
-        sub = payload.get("sub")
-        username = payload.get("username")
-        jti = payload.get("jti")
-
-        if sub is None or username is None or jti is None:
-            raise HTTPException(status_code=401, detail="Invalid token: missing required claims")
-            
-        user_id = int(sub)
         auth_service = AuthService(auth_cache)
         
         return await auth_service.refresh_tokens(
             old_refresh_token=lior_refresh_token,
             lior_access_token=lior_access_token,
-            user_id=user_id,
-            username=username,
-            refresh_jti=jti,
             response=response
         )
     except HTTPException:
         raise
+    except Exception as e:
+        logger.error(f"Refresh error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid session"
+        )
+
+
+@router.post("/google", status_code=status.HTTP_200_OK)
+async def google_auth(
+    request: GoogleAuthRequest, 
+    response: Response, 
+    db: AsyncSession = Depends(get_db)
+):
+    try:
+        user_service = UserService(db)
+        auth_service = AuthService(auth_cache, user_service)
+        
+        user_id = await auth_service.authenticate_google_user(
+            token=request.token,
+            response=response
+        )
+
+        return {
+            "message": "Google login successful",
+            "user_id": user_id
+        }
+    except HTTPException:
+            raise
     except Exception as e:
         logger.error(f"Refresh error: {e}")
         raise HTTPException(

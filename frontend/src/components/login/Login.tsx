@@ -5,14 +5,16 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
-import { login } from "../../services/api/authService";
+import { useGoogleLogin } from "@react-oauth/google";
 import type { LoginFormInputs } from "../../utils/interfaces";
 import { localStorageManualLogout } from "../../utils/constants";
+import { googleLogin, login } from "../../services/api/authService";
 import { useAuthStore, type AuthState } from "../../store/useAuthStore";
 import {
   useLoadingStore,
   type LoadingState,
 } from "../../store/useLoadingStore";
+import './login.scss'
 
 const Login = () => {
   const navigate = useNavigate();
@@ -34,7 +36,6 @@ const Login = () => {
 
       if (axios.isAxiosError(err)) {
         const status = err.response?.status;
-
         if (status === 400) {
           toast.error("Username or password is incorrect");
         } else {
@@ -47,6 +48,22 @@ const Login = () => {
       localStorage.removeItem(localStorageManualLogout);
     }
   };
+
+  const googleLoginPopup = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setIsLoading(true);
+        const userId = await googleLogin(tokenResponse.access_token);
+        setUserId(userId);
+        navigate("/dashboard");
+      } catch {
+        toast.error("Google login failed");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    onError: () => toast.error("Google login failed"),
+  });
 
   return (
     <div className="login-register-container">
@@ -75,13 +92,19 @@ const Login = () => {
             <IoEyeOff className="eye-icon" onClick={() => setShowPass(false)} />
           )}
         </div>
-        <button
-          type="submit"
-          className="login-register-btn"
-          disabled={isLoading}
-        >
-          Log in
-        </button>
+        <div className="login-form-buttons">
+          <button
+            type="submit"
+            className="login-register-btn"
+            disabled={isLoading}
+          >
+            Log in
+          </button>
+          <button type="button" className="google-login-btn" onClick={() => googleLoginPopup()}>
+            <img src="/google-icon.jpg" alt="Google" />
+            Sign in with Google
+          </button>
+        </div>
         <div className="login-register-link">
           <p>
             Don't have an account? <Link to="/register">Register</Link>

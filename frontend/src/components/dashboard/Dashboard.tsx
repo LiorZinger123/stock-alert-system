@@ -74,7 +74,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <img src="system_logo.jpg" alt="system logo" className="system-logo" />
+      <img src="system-logo.jpg" alt="system logo" className="system-logo" />
       <button className="logout-button" onClick={logout}>
         <RiLogoutCircleRLine />
       </button>

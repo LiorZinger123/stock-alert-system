@@ -17,3 +17,7 @@ class AlertStatus(str, Enum):
 class QueueNotificationPayloadTypes(str, Enum):
     ALERT_STATUS = "ALERT_STATUS_UPDATE"
     PRICE_CHANGE = "PRICE_CHANGE_UPDATE"
+
+
+class UserProviders(str, Enum):
+    GOOGLE = "google"

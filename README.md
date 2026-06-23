@@ -1,6 +1,6 @@
 The system follows an asynchronous, event-driven microservices pattern. This decouples the user-facing API from intensive background processing tasks, ensuring high availability and responsiveness.
 
-![System Architecture](system_architecture.jpg)
+![System Architecture](docs/system-architecture.jpg)
 
 ## Getting Started
 
