@@ -29,6 +29,7 @@ export const useAuthInitializer = () => {
         setIsLoading(false);
       }
     };
+
     initAuth();
   }, [setUserId, setIsLoading]);
 };

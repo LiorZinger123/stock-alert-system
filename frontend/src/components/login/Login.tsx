@@ -105,7 +105,7 @@ const Login = () => {
             className="google-login-btn"
             onClick={() => googleLoginPopup()}
           >
-            <img src="/google-icon.jpg" alt="Google" />
+            <img src="google-icon.jpg" alt="Google" />
             Sign in with Google
           </button>
         </div>

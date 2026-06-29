@@ -132,7 +132,7 @@ export const updatePriceInCache = (priceUpdates: Record<number, number>) => {
           page.map((alert) => {
             const newPrice = priceUpdates[alert.id];
             return newPrice !== undefined
-              ? { ...alert, current_price: newPrice }
+              ? { ...alert, asset: { ...alert.asset, price: newPrice } }
               : alert;
           }),
         ),

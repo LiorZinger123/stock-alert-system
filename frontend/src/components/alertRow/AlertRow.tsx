@@ -26,7 +26,7 @@ const AlertRow = ({ alert }: AlertRowProps) => {
     setIsFlashing(true);
     const timer = setTimeout(() => setIsFlashing(false), 1500);
     return () => clearTimeout(timer);
-  }, [alert.triggered_price, alert.status]);
+  }, [alert.triggered_price, alert.status, alert.asset.price]);
 
   const disabledStatuses = [
     alertStatusMap.pending,
