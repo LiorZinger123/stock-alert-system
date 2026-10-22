@@ -33,9 +33,9 @@ const AlertRow = ({ alert }: AlertRowProps) => {
     alertStatusMap.sent,
     alertStatusMap.failed,
   ];
-  const isDeleteDisabled = disabledStatuses.includes(alert.status);
+  const isAlertActionDisabled = disabledStatuses.includes(alert.status);
 
-  const { mutate: deleteAlert, isPending: isPendingDelete } = useDeleteAlert();
+  const { mutate: deleteAlert } = useDeleteAlert();
 
   const handleDelete = (): void => {
     if (disabledStatuses.includes(alert.status)) {
@@ -62,12 +62,11 @@ const AlertRow = ({ alert }: AlertRowProps) => {
           toast.error("Deletion Failed, Please Try Again Later");
         }
       },
+      onSettled: () => {
+        setIsLoading(false);
+      },
     });
   };
-
-  useEffect(() => {
-    setIsLoading(isPendingDelete);
-  }, [isPendingDelete, setIsLoading]);
 
   return (
     <>
@@ -103,20 +102,37 @@ const AlertRow = ({ alert }: AlertRowProps) => {
           {alert.status.toUpperCase()}
         </div>
         <div className="alert-row-actions">
-          <FiEdit2
-            className="alert-row-action edit-icon"
-            onClick={() => setOpenUpdateDialog(true)}
-          />
           <Tooltip
             title={
-              isDeleteDisabled ? `Cannot delete ${alert.status} alerts` : ""
+              isAlertActionDisabled
+                ? `Cannot do actions on ${alert.status} alerts`
+                : ""
+            }
+            arrow
+          >
+            <span>
+              <FiEdit2
+                className={`alert-row-action edit-icon${isAlertActionDisabled ? " disabled" : ""}`}
+                onClick={() =>
+                  !isAlertActionDisabled && setOpenUpdateDialog(true)
+                }
+              />
+            </span>
+          </Tooltip>
+          <Tooltip
+            title={
+              isAlertActionDisabled
+                ? `Cannot do actions on ${alert.status} alerts`
+                : ""
             }
             arrow
           >
             <span>
               <MdDeleteOutline
-                className={`alert-row-action delete-icon${isDeleteDisabled ? " disabled" : ""}`}
-                onClick={() => !isDeleteDisabled && setOpenDeleteDialog(true)}
+                className={`alert-row-action delete-icon${isAlertActionDisabled ? " disabled" : ""}`}
+                onClick={() =>
+                  !isAlertActionDisabled && setOpenDeleteDialog(true)
+                }
               />
             </span>
           </Tooltip>
