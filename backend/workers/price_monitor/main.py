@@ -1,9 +1,9 @@
 import asyncio
 import logging
-from core.config import settings
 from .price_monitor import PriceMonitor
 from core.database import AsyncSessionLocal
 from services.container import market_cache
+from services.container import rabbitmq_publisher
 from ..shared.worker_alert_service import WorkerAlertService
 from ..shared.worker_asset_service import WorkerAssetService
 from services.notification_service import NotificationService
@@ -18,12 +18,11 @@ async def main():
     
     alert_service = WorkerAlertService(AsyncSessionLocal)
     asset_service = WorkerAssetService(AsyncSessionLocal)
-    notification_service = NotificationService(settings.RABBITMQ_URL)
     monitor = PriceMonitor(
         market_cache=market_cache,
         alert_service=alert_service,
         asset_service=asset_service,
-        notification_service=notification_service
+        rabbitmq_publisher=rabbitmq_publisher
     )
     
     logger.info("Worker started.")

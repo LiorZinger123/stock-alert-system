@@ -16,6 +16,8 @@ EMAIL_NOTIFICATION_QUEUE_NAME = "email_queue"
 
 ALERT_STATUS_NOTIFICATION_QUEUE_NAME = "alert_status_queue"
 
-PRICE_CHANGE_QUEUE_NAME = "price_change_queue"
+PRICE_CHANGE_QUEUE_NAME = "price_change_consumer_queue"
+
+STOCK_PRICE_UPDATED_QUEUE_NAME = "stock-price-updated_queue"
 
 GOOGLE_USER_AUTH = "https://www.googleapis.com/oauth2/v3/userinfo"

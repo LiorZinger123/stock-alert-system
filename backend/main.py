@@ -13,7 +13,7 @@ from api.routes.auth import router as auth_router
 from api.routes.assets import router as assets_router
 from api.routes.alerts import router as alerts_router
 from middlewares.auth_middleware import AuthMiddleware
-from helpers.rabbitmq_utils import alert_status_consumer, price_change_consumer
+from helpers.websocket_consumer import alert_status_consumer, price_change_consumer
 
 
 logging.basicConfig(

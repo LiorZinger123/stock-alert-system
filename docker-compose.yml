@@ -65,13 +65,13 @@ services:
         condition: service_healthy
     restart: always
 
-  email_producer:
+  trigger_checker:
     build: ./backend
     env_file:
       - ./backend/.env
     volumes:
       - ./backend:/app
-    command: python -m workers.email_producer.main
+    command: python -m workers.trigger_checker.main
     depends_on:
       db:
         condition: service_healthy
@@ -79,6 +79,18 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
+    restart: always
+
+  price_broadcast:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+    command: python -m workers.price_broadcast.main
+    depends_on:
+      redis:
+        condition: service_started
     restart: always
 
   email_consumer:
