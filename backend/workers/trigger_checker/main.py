@@ -1,10 +1,10 @@
 import asyncio
 import logging
-from .email_producer import EmailProducer
 from core.config import settings
 from core.database import AsyncSessionLocal
+from services.container import rabbitmq_publisher
+from .trigger_checker_worker import TriggerCheckerWorker
 from ..shared.worker_alert_service import WorkerAlertService
-from ..shared.worker_asset_service import WorkerAssetService
 from services.notification_service import NotificationService
 
 
@@ -13,25 +13,26 @@ logger = logging.getLogger("WorkerMain")
 
 
 async def main():
-    logger.info("Initializing worker dependencies...")
+    logger.info("Initializing Worker dependencies...")
     
     alert_service = WorkerAlertService(AsyncSessionLocal)
-    asset_service = WorkerAssetService(AsyncSessionLocal)
-    notification_service = NotificationService(settings.RABBITMQ_URL)
-    monitor = EmailProducer(
+    notification_service = NotificationService(rabbitmq_publisher)
+    
+    worker = TriggerCheckerWorker(
+        amqp_url=settings.RABBITMQ_URL,
         alert_service=alert_service,
-        asset_service=asset_service,
         notification_service=notification_service
     )
     
-    logger.info("Worker started.")
+    logger.info("Worker started and listening to queue...")
     try:
-        await monitor.run_loop()
+        await worker.start()
     except Exception as e:
         logger.error(f"Worker crashed: {e}")
     finally:
         await notification_service.close()
         logger.info("Worker stopped.")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
