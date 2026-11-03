@@ -10,6 +10,9 @@ The system follows an asynchronous, event-driven microservices pattern. This dec
     * Navigate to the `backend/` directory.
     * Copy the example environment file: `cp .env.example .env`
     * Open `.env` and provide the necessary credentials (DB URLs, SMTP settings, etc.).
+    * Navigate to the `frontend/` directory.
+    * Copy the example environment file: `cp .env.example .env`
+    * Open `.env` and provide the necessary credentials (Backend url, Google client id)
 
 ### Running the System
 To launch the system, run the following commands in the root directory:
