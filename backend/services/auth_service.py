@@ -1,10 +1,10 @@
 import jwt
 import httpx
 import random
+import logging
 from typing import Optional
 from fastapi import HTTPException, status, Response
 from db.models import User
-from .container import auth_cache
 from helpers.enums import UserProviders
 from services.cache_managers import AuthCache
 from services.user_service import UserService
@@ -20,6 +20,9 @@ from helpers.security import (
 )
 
 
+logger = logging.getLogger(__name__)
+
+
 class AuthService:
     def __init__(self, auth_cache: AuthCache, user_service: Optional[UserService] = None):
         self.auth_cache = auth_cache
@@ -27,9 +30,13 @@ class AuthService:
 
     async def create_and_save_tokens(self, user: User, expire: int = TOKEN_COOKIES_EXPIRE_SECONDS) -> tuple[str, str]:
         access_token, refresh_token = create_tokens(user.id, user.username)
-        await self.auth_cache.save_token(refresh_token, {"status": "active"}, expire)
+        
+        try:
+            await self.auth_cache.save_token(refresh_token, {"status": "active"}, expire)
+        except Exception as redis_error:
+            logger.warning(f"Redis is down, failed to cache refresh token for user {user.id}: {redis_error}")
+            
         return access_token, refresh_token
-    
     
     def verify_access_jti_match(self, lior_access_token: str | None, refresh_jti: str) -> None:
         if not lior_access_token:
@@ -47,22 +54,25 @@ class AuthService:
             )
 
         if refresh_jti != expected_refresh_jti:
-            print(f"Security Alert: JTI mismatch! Refresh: {refresh_jti}, Access expected: {expected_refresh_jti}")
+            logger.warning(f"Security Alert: JTI mismatch! Refresh: {refresh_jti}, Access expected: {expected_refresh_jti}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, 
                 detail="Token reuse or invalid session detected."
             )
     
-
     async def handle_new_tokens_generation(self, response: Response, user_id: int, username: str) -> tuple[str, str]:
         new_access_token, new_refresh_token = create_tokens(user_id, username)
         data = {
             "status": "active"
         }
-        await auth_cache.save_token(new_refresh_token, data, TOKEN_COOKIES_EXPIRE_SECONDS)
+        
+        try:
+            await self.auth_cache.save_token(new_refresh_token, data, TOKEN_COOKIES_EXPIRE_SECONDS)
+        except Exception as redis_error:
+            logger.warning(f"Redis is down, failed to cache new refresh token during generation: {redis_error}")
+            
         set_tokens_cookies(response, new_access_token, new_refresh_token, TOKEN_COOKIES_EXPIRE_SECONDS)
         return new_access_token, new_refresh_token
-
 
     async def register_user(self, payload: RegisterPayload, response: Response) -> int:
         if not self.user_service:
@@ -102,7 +112,7 @@ class AuthService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Authentication service misconfigured: User database access required."
             )
-          
+         
         user = await self.user_service.get_user_by_username(payload.username)
 
         if not user or not verify_password(payload.password, user.password):
@@ -116,7 +126,10 @@ class AuthService:
         return user.id
 
     async def logout_user(self, refresh_token: str) -> None:
-        await self.auth_cache.delete_token(refresh_token)
+        try:
+            await self.auth_cache.delete_token(refresh_token)
+        except Exception as redis_error:
+            logger.error(f"Failed to delete token from cache during logout: {redis_error}")
 
     async def refresh_tokens(self,
                             old_refresh_token: str,
@@ -137,34 +150,44 @@ class AuthService:
             self.verify_access_jti_match(lior_access_token, jti)
             _, new_refresh_token = await self.handle_new_tokens_generation(response, user_id, username)
             
-            await self.auth_cache.save_token(
-                old_refresh_token, 
-                {"status": "used", "new_refresh_token": new_refresh_token},
-                USED_TOKEN_TTL_SECONDS
-            )
+            try:
+                await self.auth_cache.save_token(
+                    old_refresh_token, 
+                    {"status": "used", "new_refresh_token": new_refresh_token},
+                    USED_TOKEN_TTL_SECONDS
+                )
+            except Exception as redis_error:
+                logger.error(f"Failed to save used token status in Redis: {redis_error}")
+                
             return {"message": "Token refreshed and re-synced"}
 
         status_val = token_status.get("status")
 
         if status_val == "active":
             _, new_refresh_token = await self.handle_new_tokens_generation(response, user_id, username)
-            await self.auth_cache.save_token(
-                old_refresh_token, 
-                {"status": "used", "new_refresh_token": new_refresh_token},
-                USED_TOKEN_TTL_SECONDS
-            )
+            try:
+                await self.auth_cache.save_token(
+                    old_refresh_token, 
+                    {"status": "used", "new_refresh_token": new_refresh_token},
+                    USED_TOKEN_TTL_SECONDS
+                )
+            except Exception as redis_error:
+                logger.error(f"Failed to update token status to 'used' in Redis: {redis_error}")
+                
             return {"message": "Token refreshed successfully"}
 
         elif status_val == "used":
             new_refresh_token = token_status.get("new_refresh_token")
+            if not new_refresh_token:
+                raise HTTPException(status_code=401, detail="Invalid session state")
+                
             new_refresh_payload = decode_token(new_refresh_token)
+            new_jti = new_refresh_payload.get("jti")
 
-            jti = new_refresh_payload.get("jti")
-
-            if jti is None:
+            if new_jti is None:
                 raise HTTPException(status_code=401, detail="Invalid token: missing JTI")
             
-            new_access_token = create_access_token(user_id, username, jti)
+            new_access_token = create_access_token(user_id, username, new_jti)
             
             set_tokens_cookies(response, new_access_token, new_refresh_token, TOKEN_COOKIES_EXPIRE_SECONDS)
             return {"message": "Token refreshed successfully (from cached)"}

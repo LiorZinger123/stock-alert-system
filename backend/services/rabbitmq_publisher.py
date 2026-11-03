@@ -19,7 +19,7 @@ class RabbitMQPublisher:
             self.channel = await self.connection.channel()
         return self.channel
 
-    async def publish(self, queue_name: str, message_body: dict) -> None:
+    async def publish(self, queue_name: str, message_body: dict | list) -> None:
         channel = await self.get_channel()
         queue = await channel.declare_queue(queue_name, durable=True)
 

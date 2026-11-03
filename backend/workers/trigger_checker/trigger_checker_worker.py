@@ -1,5 +1,6 @@
 import json
 import logging
+import asyncio
 import aio_pika
 from db.models import Alert
 from helpers.enums import ConditionEnum
@@ -42,6 +43,8 @@ class TriggerCheckerWorker:
                             await self.process_price_updates(price_updates)
                         except Exception as e:
                             logger.exception(f"Error processing price update message: {e}")
+                            await asyncio.sleep(2)
+                            raise e
 
     async def process_price_updates(self, price_updates: dict[str, float]) -> None:
         if not price_updates:
@@ -70,8 +73,12 @@ class TriggerCheckerWorker:
         return False
 
     async def trigger_notification(self, alert: Alert, current_price: float) -> None:
-        await self.alert_service.mark_alert_as_pending(alert.id, current_price)
-        await self.notification_service.send_email_notification(alert, current_price)
-        await self.notification_service.send_alert_status_notification(
-            alert.user_id, alert.id, AlertStatus.PENDING, current_price
-        )
+        try:
+            await self.alert_service.mark_alert_as_pending(alert.id, current_price)
+            await self.notification_service.send_email_notification(alert, current_price)
+            await self.notification_service.send_alert_status_notification(
+                alert.user_id, alert.id, AlertStatus.PENDING, current_price
+            )
+        except Exception as e:
+            logger.error(f"Failed to process notification pipeline for alert {alert.id}: {e}")
+            raise e

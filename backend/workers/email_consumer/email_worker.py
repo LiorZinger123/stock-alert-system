@@ -1,5 +1,6 @@
 import json
 import logging
+import asyncio
 import aio_pika
 from helpers.enums import AlertStatus
 from .email_service import EmailService
@@ -44,6 +45,8 @@ class EmailWorker:
                             await self.send_email_task(**body)
                         except Exception as e:
                             logger.exception(f"Error processing email message: {e}")
+                            await asyncio.sleep(2)
+                            raise e
 
     async def send_email_task(
         self, 

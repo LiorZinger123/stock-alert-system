@@ -1,4 +1,5 @@
 import json
+import asyncio
 import logging
 import aio_pika
 from helpers.constants import STOCK_PRICE_UPDATED_QUEUE_NAME
@@ -33,12 +34,15 @@ class PriceBroadcastWorker:
             
             async with queue.iterator() as queue_iter:
                 async for message in queue_iter:
-                    async with message.process():
-                        try:
-                            price_updates = json.loads(message.body.decode())
-                            await self.process_price_updates(price_updates)
-                        except Exception as e:
-                            logger.exception(f"Error processing price broadcast message: {e}")
+                    try:
+                        price_updates = json.loads(message.body.decode())
+                        await self.process_price_updates(price_updates)
+                        await message.ack()
+                        
+                    except Exception as e:
+                        logger.exception(f"Error processing price broadcast message: {e}")
+                        await asyncio.sleep(2)
+                        await message.nack(requeue=False)
 
     async def process_price_updates(self, price_updates: dict[str, float]) -> None:
         if not price_updates:

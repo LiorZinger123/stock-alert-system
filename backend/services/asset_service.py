@@ -25,10 +25,17 @@ class AssetService:
         if asset:
             return asset
 
-        ticker = yf.Ticker(symbol)
-        info = ticker.info
-        raw_price = ticker.fast_info.last_price
-        rounded_price = round(float(raw_price), 2) if raw_price is not None else None
+        try:
+            ticker = yf.Ticker(symbol)
+            info = ticker.info or {}
+            
+            raw_price = getattr(ticker.fast_info, "last_price", None)
+            rounded_price = round(float(raw_price), 2) if raw_price is not None else None
+            
+        except Exception as e:
+            logger.error(f"Failed to fetch stock info from Yahoo Finance for {symbol}: {e}")
+            rounded_price = None
+            info = {}
 
         new_asset = Asset(
             symbol=symbol,
@@ -38,12 +45,16 @@ class AssetService:
             exchange=info.get("exchange"),
             price=rounded_price
         )
+        
         self.db.add(new_asset)
         await self.db.commit()
         await self.db.refresh(new_asset)
 
-        if rounded_price:
-            await market_cache.set_price(symbol, rounded_price)
+        if rounded_price is not None:
+            try:
+                await market_cache.set_price(symbol, rounded_price)
+            except Exception as redis_error:
+                logger.error(f"Redis is down, failed to cache price for new asset {symbol}: {redis_error}")
 
         return new_asset
 

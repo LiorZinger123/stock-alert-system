@@ -25,23 +25,23 @@ class MarketCache:
     async def get_price(self, symbol: str) -> Optional[float]:
         return await self.redis.read(f"stock:price:{symbol}")
 
-    async def get_prices(self, symbols: list[str]) -> dict:
-        raw_values = await self.redis.mget(symbols)
+    async def get_prices(self, symbols: list[str]) -> dict[str, Optional[float]]:
+        cache_keys = [f"stock:price:{symbol}" for symbol in symbols]
+        
+        raw_values = await self.redis.mget(cache_keys)
         result = {}
 
-        for key, val in zip(symbols, raw_values):
+        for symbol, val in zip(symbols, raw_values):
             if val is None:
-                result[key] = None
-            elif isinstance(val, (int, float)):
-                result[key] = val
-            elif isinstance(val, (str, bytes)):
-                try:
-                    result[key] = json.loads(val)
-                except json.JSONDecodeError:
-                    result[key] = float(val)
-            else:
-                result[key] = val
-                
+                result[symbol] = None
+                continue
+
+            try:
+                parsed_val = json.loads(val) if isinstance(val, (str, bytes)) else val
+                result[symbol] = float(parsed_val) if parsed_val is not None else None
+            except (json.JSONDecodeError, ValueError, TypeError) as e:
+                result[symbol] = None
+
         return result
     
     async def set_price(self, symbol: str, price: float, expire: int = CACHE_TTL_PRICE) -> None:

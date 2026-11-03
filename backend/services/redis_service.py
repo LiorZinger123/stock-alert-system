@@ -1,7 +1,12 @@
 import json
+import logging
+from collections.abc import Sequence
 from typing import Optional, Any
 import redis.asyncio as aioredis
 from redis.asyncio.client import Pipeline
+
+
+logger = logging.getLogger(__name__)
 
 
 class RedisService:
@@ -14,12 +19,23 @@ class RedisService:
         return self.client.pipeline(**kwargs)
 
     async def read(self, key: str) -> Optional[Any]:
-        data = await self.client.get(key)
-        return json.loads(data) if data else None
-    
-    async def mget(self, keys: list[str]) -> list[Any]:
-        raw_values = await self.client.mget(keys)
-        return [json.loads(v) if v is not None else None for v in raw_values]
+        try:
+            data = await self.client.get(key)
+            return json.loads(data) if data else None
+        except Exception as e:
+            logger.error(f"Redis read failure for key {key}: {e}")
+            return None
+
+    async def mget(self, keys: list[str]) -> Sequence[str | None]:
+        try:
+            raw_values = await self.client.mget(keys)
+            return [
+                v.decode("utf-8") if isinstance(v, bytes) else v 
+                for v in raw_values
+            ]
+        except Exception as e:
+            logger.error(f"Redis mget failure: {e}")
+            return [None] * len(keys)
 
     async def write(self, key: str, value: Any, expire: Optional[int] = None) -> None:
         await self.client.set(key, json.dumps(value), ex=expire)

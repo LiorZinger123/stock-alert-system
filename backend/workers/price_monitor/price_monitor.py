@@ -3,7 +3,7 @@ import asyncio
 import logging
 import yfinance as yf
 from services.cache_managers import MarketCache
-from services.notification_service import RabbitMQPublisher
+from services.container import rabbitmq_publisher
 from helpers.constants import STOCK_PRICE_UPDATED_QUEUE_NAME
 from ..shared.worker_alert_service import WorkerAlertService
 from ..shared.worker_asset_service import WorkerAssetService
@@ -18,7 +18,6 @@ class PriceMonitor:
             market_cache: MarketCache,
             alert_service: WorkerAlertService,
             asset_service: WorkerAssetService,
-            rabbitmq_publisher: RabbitMQPublisher
         ):
         self.market_cache = market_cache
         self.alert_service = alert_service
@@ -68,10 +67,15 @@ class PriceMonitor:
         if updates_needed:
             logger.info(f"Detected {len(updates_needed)} price changes. Updating systems...")
             
-            formatted_updates = {f"stock:price:{s}": p for s, p in updates_needed.items()}
-            await self.market_cache.set_prices(formatted_updates)
-            await self.asset_service.bulk_update_prices(updates_needed)
+            redis_formatted_updates = {f"stock:price:{s}": p for s, p in updates_needed.items()}
+            db_formatted_updates = [{"symbol": symbol, "price": price} for symbol, price in updates_needed.items()]
 
+            try:
+                await self.market_cache.set_prices(redis_formatted_updates)
+            except Exception as redis_error:
+                logger.error(f"Redis failure (cache update skipped): {redis_error}")
+
+            await self.asset_service.bulk_update_prices(db_formatted_updates, send_event=True)
             await self.rabbitmq_publisher.publish(STOCK_PRICE_UPDATED_QUEUE_NAME, updates_needed)
         else:
             logger.info("No price changes detected. Systems are up to date.")

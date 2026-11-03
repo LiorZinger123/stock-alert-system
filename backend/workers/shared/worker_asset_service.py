@@ -1,8 +1,11 @@
 import logging
-from sqlalchemy import select, update
+from typing import Optional
+from sqlalchemy import select, update, BindParameter
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from db.models import Asset
 from services.container import market_cache
+from services.container import rabbitmq_publisher
+from helpers.constants import ASSETS_PRICES_RETRY_QUEUE
 
 
 logger = logging.getLogger(__name__)
@@ -12,41 +15,29 @@ class WorkerAssetService:
     def __init__(self, session_factory: async_sessionmaker[AsyncSession]):
         self.session_factory = session_factory
 
-    async def get_latest_prices(self, symbols: list[str]) -> dict[str, float]:
-        prices = await market_cache.get_prices(symbols) 
-        
-        for symbol, price in prices.items():
-            if price is None:
-                prices[symbol] = await self.get_price_from_db_by_symbol(symbol)
-        
-        return prices
+    async def bulk_update_prices(
+            self,
+            price_map: list[dict[str, float]],
+            send_event: Optional[bool] = None
+        ) -> None:
+        if not price_map:
+            return
 
-    async def get_price_from_db_by_symbol(self, symbol: str) -> float | None:
-        async with self.session_factory() as session:
-            query = select(Asset.price).where(Asset.symbol == symbol)
-            result = await session.execute(query)
-            return result.scalar_one_or_none()
-
-    async def bulk_update_prices(self, price_map: dict[str, float]) -> None:
         async with self.session_factory() as session:
             try:
-                for symbol, price in price_map.items():
-                    query = (
-                        update(Asset)
-                        .where(Asset.symbol == symbol)
-                        .values(price=price)
-                    )
-                    await session.execute(query)
+                query = (
+                    update(Asset)
+                    .where(Asset.symbol == BindParameter("symbol"))
+                    .values(price=BindParameter("price"))
+                )
                 
+                await session.execute(query, price_map)
                 await session.commit()
+                
                 logger.info(f"Successfully updated {len(price_map)} assets in DB.")
             except Exception as e:
                 await session.rollback()
                 logger.error(f"Failed to bulk update assets in DB: {e}")
-                raise e
 
-    async def get_all_symbols(self) -> list[str]:
-        async with self.session_factory() as session:
-            query = select(Asset.symbol)
-            result = await session.execute(query)
-            return list(result.scalars().all())
+                if send_event:
+                    await rabbitmq_publisher.publish(ASSETS_PRICES_RETRY_QUEUE, price_map)

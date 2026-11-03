@@ -18,6 +18,10 @@ ALERT_STATUS_NOTIFICATION_QUEUE_NAME = "alert_status_queue"
 
 PRICE_CHANGE_QUEUE_NAME = "price_change_consumer_queue"
 
-STOCK_PRICE_UPDATED_QUEUE_NAME = "stock-price-updated_queue"
+STOCK_PRICE_UPDATED_QUEUE_NAME = "stock_price_updated_queue"
+
+ASSETS_PRICES_RETRY_QUEUE = "assets_prices_retry_queue"
+
+DLQ_NAME = f"{ASSETS_PRICES_RETRY_QUEUE}_dlq"
 
 GOOGLE_USER_AUTH = "https://www.googleapis.com/oauth2/v3/userinfo"
