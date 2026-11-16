@@ -26,6 +26,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
       interval: 10s
@@ -101,8 +103,12 @@ services:
       - ./backend:/app
     command: python -m workers.email_consumer.main
     depends_on:
+      db:
+        condition: service_healthy
       redis:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
     restart: always
 
   db_sync:
@@ -113,14 +119,18 @@ services:
       - ./backend:/app
     command: python -m workers.db_sync.main
     depends_on:
+      db:
+        condition: service_healthy
       redis:
         condition: service_started
     restart: always
 
   frontend:
-    build: ./frontend
-    env_file:
-      - ./frontend/.env
+    build:
+      context: ./frontend
+      args:
+        VITE_BACKEND_URL: "${VITE_BACKEND_URL:-http://localhost:8000}"
+        VITE_GOOGLE_CLIENT_ID: "${VITE_GOOGLE_CLIENT_ID:-79490109504-p00v536gninogekv1cdgq6pn1gds475q.apps.googleusercontent.com}"
     ports:
       - "3000:80"
     restart: always

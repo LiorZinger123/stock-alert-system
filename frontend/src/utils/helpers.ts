@@ -12,6 +12,7 @@ export const isDuplicateAlert = (
       alert.asset.symbol === newAssetSymbol &&
       alert.target_price === newPrice &&
       alert.condition === newCondition &&
-      alert.id !== excludeId,
+      alert.id !== excludeId &&
+      ["active", "inactive"].includes(alert.status),
   );
 };

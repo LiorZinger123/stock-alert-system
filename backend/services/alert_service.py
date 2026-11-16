@@ -45,7 +45,8 @@ class AlertService:
                 Alert.user_id == user_id,
                 Alert.asset_id == asset.id,
                 Alert.target_price == alert_data.target_price,
-                Alert.condition == alert_data.condition
+                Alert.condition == alert_data.condition,
+                Alert.status.in_(["active", "inactive"]),
             )
         )
         result = await self.db.execute(query)
