@@ -68,14 +68,13 @@ class PriceMonitor:
             logger.info(f"Detected {len(updates_needed)} price changes. Updating systems...")
             
             redis_formatted_updates = {f"stock:price:{s}": p for s, p in updates_needed.items()}
-            db_formatted_updates = [{"symbol": symbol, "price": price} for symbol, price in updates_needed.items()]
 
             try:
                 await self.market_cache.set_prices(redis_formatted_updates)
             except Exception as redis_error:
                 logger.error(f"Redis failure (cache update skipped): {redis_error}")
 
-            await self.asset_service.bulk_update_prices(db_formatted_updates, send_event=True)
+            await self.asset_service.bulk_update_prices(updates_needed, send_event=True)
             await self.rabbitmq_publisher.publish_to_exchange(STOCK_PRICE_FANOUT_EXCHANGE, updates_needed)
         else:
             logger.info("No price changes detected. Systems are up to date.")

@@ -79,7 +79,7 @@ class DBSyncWorker:
                             )
                             await message.ack()
 
-    async def process_price_updates(self, price_updates: list[dict[str, float]]) -> None:
+    async def process_price_updates(self, price_updates: dict[str, float]) -> None:
         if not price_updates:
             return
 
