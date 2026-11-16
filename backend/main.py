@@ -28,17 +28,20 @@ logging.basicConfig(
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     print("--- LIFESPAN STARTING ---")
-    task = asyncio.create_task(alert_status_consumer())
-    task = asyncio.create_task(price_change_consumer())
+    tasks = [alert_status_consumer, price_change_consumer]
+    background_tasks: set[asyncio.Task] = set()
+
+    for t in tasks:
+        task = asyncio.create_task(t())
+        background_tasks.add(task)
+        task.add_done_callback(background_tasks.discard)
 
     yield
     
-    task.cancel()
-    try:
-        await task
-    except asyncio.CancelledError:
-        pass
+    for task in background_tasks:
+        task.cancel()
 
+    await asyncio.gather(*background_tasks, return_exceptions=True)
     await redis_service.close()
     await engine.dispose()
 
