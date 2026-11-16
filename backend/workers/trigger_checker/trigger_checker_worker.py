@@ -5,9 +5,9 @@ import aio_pika
 from db.models import Alert
 from helpers.enums import ConditionEnum
 from api.schemas.alerts import AlertStatus
-from helpers.constants import STOCK_PRICE_UPDATED_QUEUE_NAME
 from ..shared.worker_alert_service import WorkerAlertService
 from services.notification_service import NotificationService
+from helpers.constants import TRIGGER_CHECKER_QUEUE_NAME, STOCK_PRICE_FANOUT_EXCHANGE
 
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ class TriggerCheckerWorker:
         self.amqp_url = amqp_url
         self.alert_service = alert_service
         self.notification_service = notification_service
-        self.queue_name = STOCK_PRICE_UPDATED_QUEUE_NAME
+        self.queue_name = TRIGGER_CHECKER_QUEUE_NAME
 
     async def start(self) -> None:
         connection = await aio_pika.connect_robust(self.amqp_url)
@@ -31,9 +31,16 @@ class TriggerCheckerWorker:
             channel = await connection.channel()
             await channel.set_qos(prefetch_count=10)
             
+            exchange = await channel.declare_exchange(
+                name=STOCK_PRICE_FANOUT_EXCHANGE, 
+                type=aio_pika.ExchangeType.FANOUT, 
+                durable=True
+            )
+            
             queue = await channel.declare_queue(self.queue_name, durable=True)
             
-            logger.info(f"TriggerCheckerWorker listening to queue: {self.queue_name}")
+            await queue.bind(exchange)
+            logger.info(f"TriggerCheckerWorker listening to dedicated queue via Fanout Exchange: {queue.name}")
             
             async with queue.iterator() as queue_iter:
                 async for message in queue_iter:

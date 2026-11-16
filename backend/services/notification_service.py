@@ -27,7 +27,7 @@ class NotificationService:
             "current_price": str(current_price),
             "condition": str(alert.condition.value) if hasattr(alert.condition, 'value') else str(alert.condition)
         }
-        await self.publisher.publish(self.email_queue_name, email_payload)
+        await self.publisher.publish_to_queue(self.email_queue_name, email_payload)
 
     async def send_alert_status_notification(
         self, 
@@ -45,7 +45,7 @@ class NotificationService:
                 "triggered_price": price
             }
         }
-        await self.publisher.publish(self.alert_status_queue_name, alert_status_payload)
+        await self.publisher.publish_to_queue(self.alert_status_queue_name, alert_status_payload)
 
     async def send_price_change_notification(self, user_id: int, payload: dict) -> None:
         price_change_payload = {
@@ -55,7 +55,7 @@ class NotificationService:
                 **payload
             }
         }
-        await self.publisher.publish(self.price_change_queue_name, price_change_payload)
+        await self.publisher.publish_to_queue(self.price_change_queue_name, price_change_payload)
 
     async def close(self):
         await self.publisher.close()

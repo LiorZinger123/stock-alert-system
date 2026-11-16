@@ -4,7 +4,7 @@ import logging
 import yfinance as yf
 from services.cache_managers import MarketCache
 from services.container import rabbitmq_publisher
-from helpers.constants import STOCK_PRICE_UPDATED_QUEUE_NAME
+from helpers.constants import STOCK_PRICE_FANOUT_EXCHANGE
 from ..shared.worker_alert_service import WorkerAlertService
 from ..shared.worker_asset_service import WorkerAssetService
 
@@ -76,7 +76,7 @@ class PriceMonitor:
                 logger.error(f"Redis failure (cache update skipped): {redis_error}")
 
             await self.asset_service.bulk_update_prices(db_formatted_updates, send_event=True)
-            await self.rabbitmq_publisher.publish(STOCK_PRICE_UPDATED_QUEUE_NAME, updates_needed)
+            await self.rabbitmq_publisher.publish_to_exchange(STOCK_PRICE_FANOUT_EXCHANGE, updates_needed)
         else:
             logger.info("No price changes detected. Systems are up to date.")
 

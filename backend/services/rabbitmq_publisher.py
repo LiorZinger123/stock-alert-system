@@ -19,7 +19,7 @@ class RabbitMQPublisher:
             self.channel = await self.connection.channel()
         return self.channel
 
-    async def publish(self, queue_name: str, message_body: dict | list) -> None:
+    async def publish_to_queue(self, queue_name: str, message_body: dict | list) -> None:
         channel = await self.get_channel()
         queue = await channel.declare_queue(queue_name, durable=True)
 
@@ -30,6 +30,25 @@ class RabbitMQPublisher:
             ),
             routing_key=queue.name,
         )
+        logger.debug(f"Published message directly to queue: {queue_name}")
+
+    async def publish_to_exchange(self, exchange_name: str, message_body: dict | list, exchange_type=aio_pika.ExchangeType.FANOUT) -> None:
+        channel = await self.get_channel()
+        
+        exchange = await channel.declare_exchange(
+            name=exchange_name,
+            type=exchange_type,
+            durable=True
+        )
+
+        await exchange.publish(
+            aio_pika.Message(
+                body=json.dumps(message_body).encode(),
+                delivery_mode=aio_pika.DeliveryMode.PERSISTENT
+            ),
+            routing_key="",
+        )
+        logger.info(f"Published message to exchange: {exchange_name}")
 
     async def close(self):
         if self.connection and not self.connection.is_closed:
