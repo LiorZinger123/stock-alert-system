@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
@@ -18,7 +18,7 @@ import "./login.scss";
 
 const Login = () => {
   const navigate = useNavigate();
-  const setUserId = useAuthStore((state: AuthState) => state.setUserId);
+  const { userId, setUserId } = useAuthStore((state: AuthState) => state);
   const { isLoading, setIsLoading } = useLoadingStore(
     (state: LoadingState) => state,
   );
@@ -64,6 +64,12 @@ const Login = () => {
     },
     onError: () => toast.error("Google login failed"),
   });
+
+  useEffect(() => {
+    if (userId) {
+      navigate("/dashboard", {replace: true});
+    }
+  }, [userId, navigate]);
 
   return (
     <div className="login-register-container">

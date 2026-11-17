@@ -21,7 +21,8 @@ export const useAuthInitializer = () => {
       }
 
       try {
-        const res = await api.get("/me", { skipAuthInterceptor: true });
+        setIsLoading(true);
+        const res = await api.get("/me");
         setUserId(res.data.user_id);
       } catch {
         console.log("User not logged in");
