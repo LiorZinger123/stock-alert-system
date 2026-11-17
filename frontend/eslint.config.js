@@ -2,7 +2,6 @@ import js from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import reactRefresh from 'eslint-plugin-react-refresh';
-import reactCompiler from 'eslint-plugin-react-compiler';
 import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
 import { defineConfig, globalIgnores } from 'eslint/config';
@@ -18,7 +17,6 @@ export default defineConfig([
       prettierConfig,
     ],
     plugins: {
-      'react-compiler': reactCompiler,
       'prettier': prettierPlugin,
     },
     languageOptions: {
@@ -28,7 +26,6 @@ export default defineConfig([
       },
     },
     rules: {
-      'react-compiler/react-compiler': 'error',
       'prettier/prettier': 'error',
 
       '@typescript-eslint/no-explicit-any': 'error',
