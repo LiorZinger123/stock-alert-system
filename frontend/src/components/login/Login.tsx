@@ -60,6 +60,7 @@ const Login = () => {
         toast.error("Google login failed");
       } finally {
         setIsLoading(false);
+        localStorage.removeItem(localStorageManualLogout);
       }
     },
     onError: () => toast.error("Google login failed"),
