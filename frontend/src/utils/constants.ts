@@ -34,3 +34,5 @@ export const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || "";
 export const wsBaseUrl = backendBaseUrl.replace(/^http/, "ws");
 
 export const localStorageManualLogout = "auth_manual_logout";
+
+export const alertsPaginatedLimit = 20;

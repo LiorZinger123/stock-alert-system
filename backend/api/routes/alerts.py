@@ -14,15 +14,15 @@ logger = logging.getLogger(__name__)
 
 @router.get("", response_model=list[AlertReadSchema])
 async def get_user_alerts(
-    offset: int,
-    limit: int,
+    limit: int = 20,
+    cursor_id: int | None = None,
     user_id: int = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db)
 ) -> list[AlertReadSchema]:
     try:
         asset_service = AssetService(db)
         alert_service = AlertService(db, asset_service)
-        return await alert_service.get_all_by_user(user_id, offset, limit)
+        return await alert_service.get_all_by_user(user_id, cursor_id, limit)
     except Exception as e:
         logger.error(f"Error fetching alerts: {e}")
         raise HTTPException(

@@ -54,8 +54,8 @@ const AlertsList = () => {
   }, [data]);
 
   useEffect(() => {
-    setIsLoading(status === "pending");
-  }, [status, setIsLoading]);
+    setIsLoading(status === "pending" || isFetchingNextPage);
+  }, [setIsLoading, status, isFetchingNextPage]);
 
   return (
     <>

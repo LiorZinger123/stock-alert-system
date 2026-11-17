@@ -9,7 +9,6 @@ import { logoutUser } from "../../services/api/authService";
 import type { SearchedAsset } from "../../utils/interfaces";
 import { useLoadingStore } from "../../store/useLoadingStore";
 import { localStorageManualLogout } from "../../utils/constants";
-import { useInfiniteAlerts } from "../../services/queries/alertQueries";
 import { useAuthStore, type AuthState } from "../../store/useAuthStore";
 import {
   useAssetDetails,
@@ -21,7 +20,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { setIsLoading } = useLoadingStore();
   const { clearUser } = useAuthStore((state: AuthState) => state);
-  const { status, isFetchingNextPage } = useInfiniteAlerts();
   const [selectedAsset, setSelectedAsset] = useState<SearchedAsset | null>(
     null,
   );
@@ -67,10 +65,8 @@ const Dashboard = () => {
   }, [assetDetails, selectedAsset]);
 
   useEffect(() => {
-    setIsLoading(
-      status === "pending" || isFetchingNextPage || isDetailsLoading,
-    );
-  }, [status, isFetchingNextPage, isDetailsLoading, setIsLoading]);
+    setIsLoading(isDetailsLoading);
+  }, [setIsLoading, isDetailsLoading]);
 
   return (
     <div className="dashboard">

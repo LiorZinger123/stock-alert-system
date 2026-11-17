@@ -23,15 +23,27 @@ class AlertService:
         if alert.status == AlertStatus.PENDING:
             raise HTTPException(status_code=status.HTTP_423_LOCKED, detail=f"Alert {alert.id} is in process.")
 
-    async def get_all_by_user(self, user_id: int, offset: int = 0, limit: int = 20) -> list[AlertReadSchema]:
+    async def get_all_by_user(
+        self, 
+        user_id: int, 
+        cursor_id: int | None,
+        limit: int,
+    ) -> list[AlertReadSchema]:
         query = (
             select(Alert)
             .options(joinedload(Alert.asset))
             .where(Alert.user_id == user_id)
-            .order_by(desc(Alert.created_at))
-            .limit(limit)
-            .offset(offset)
         )
+        
+        if cursor_id is not None:
+            query = query.where(Alert.id < cursor_id)
+            
+        query = (
+            query
+            .order_by(desc(Alert.created_at), desc(Alert.id))
+            .limit(limit)
+        )
+        
         result = await self.db.execute(query)
         alerts = result.scalars().all()
         

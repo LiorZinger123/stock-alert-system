@@ -4,18 +4,19 @@ import {
   type InfiniteData,
 } from "@tanstack/react-query";
 import { queryClient } from "../../lib/queryClient";
-import type {
-  CreateNewAlertData,
-  UpdateAlertFormData,
-  Alert,
-  AlertStatus,
-} from "../../utils/interfaces";
+import { alertsPaginatedLimit } from "../../utils/constants";
 import {
   createNewAlert,
   deleteUserAlert,
   fetchAlertsPaginated,
   updateUserAlert,
 } from "../api/alertsService";
+import type {
+  CreateNewAlertData,
+  UpdateAlertFormData,
+  Alert,
+  AlertStatus,
+} from "../../utils/interfaces";
 
 export const alertKeys = {
   all: ["alerts"] as const,
@@ -25,10 +26,21 @@ export const alertKeys = {
 export const useInfiniteAlerts = () => {
   return useInfiniteQuery({
     queryKey: alertKeys.lists(),
-    queryFn: ({ pageParam }) => fetchAlertsPaginated(pageParam as number),
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.length === 5 ? allPages.length * 5 : undefined,
-    initialPageParam: 0,
+    queryFn: ({ pageParam }) =>
+      fetchAlertsPaginated(pageParam as number | undefined),
+    getNextPageParam: (lastPage) => {
+      if (
+        !lastPage ||
+        lastPage.length === 0 ||
+        lastPage.length < alertsPaginatedLimit
+      ) {
+        return undefined;
+      }
+
+      return lastPage[lastPage.length - 1].id;
+    },
+
+    initialPageParam: undefined as number | undefined,
   });
 };
 

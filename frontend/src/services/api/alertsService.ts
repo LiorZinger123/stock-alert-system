@@ -4,15 +4,13 @@ import type {
   CreateNewAlertData,
   UpdateAlertFormData,
 } from "../../utils/interfaces";
+import { alertsPaginatedLimit } from "../../utils/constants";
 
-export const fetchAlertsPaginated = async (
-  offset: number,
-  limit: number = 5,
-): Promise<Alert[]> => {
+export const fetchAlertsPaginated = async (cursorId?: number) => {
   const { data } = await api.get<Alert[]>("/alerts", {
     params: {
-      offset,
-      limit,
+      cursor_id: cursorId,
+      limit: alertsPaginatedLimit,
     },
   });
   return data;
