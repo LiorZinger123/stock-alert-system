@@ -13,77 +13,55 @@ declare module "axios" {
   }
 }
 
-let isRefreshing = false;
-let failedQueue: {
-  resolve: (value: void | PromiseLike<void>) => void;
-  reject: (reason: unknown) => void;
-}[] = [];
+let refreshPromise: Promise<void> | null = null;
 
 const api = axios.create({
   baseURL: backendBaseUrl,
   withCredentials: true,
 });
 
-const processQueue = (error: AxiosError | null = null): void => {
-  failedQueue.forEach((prom) => {
-    if (error) prom.reject(error);
-    else prom.resolve();
-  });
-  failedQueue = [];
+const redirectToLogin = () => {
+  useAuthStore.getState().clearUser();
+  if (!window.location.pathname.startsWith("/login")) {
+    window.location.replace("/login");
+  }
 };
 
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & {
-      skipAuthInterceptor?: boolean;
-      _retry?: boolean;
-    };
-
-    if (error.response?.status === 401 && originalRequest.skipAuthInterceptor) {
-      return Promise.reject(error);
-    }
-
-    if (error.response?.status === 401 && originalRequest._retry) {
-      return Promise.reject(error);
-    }
+    const originalRequest = error.config as
+      | InternalAxiosRequestConfig
+      | undefined;
 
     if (
-      error.response?.status === 401 &&
-      originalRequest.url?.includes("/auth/refresh")
+      !originalRequest ||
+      error.response?.status !== 401 ||
+      originalRequest.skipAuthInterceptor ||
+      originalRequest._retry
     ) {
-      useAuthStore.getState().clearUser();
-      window.location.href = "/login";
       return Promise.reject(error);
     }
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      if (isRefreshing) {
-        return new Promise<void>((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then(() => api(originalRequest))
-          .catch((err: AxiosError) => Promise.reject(err));
-      }
+    originalRequest._retry = true;
 
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        await api.post("/auth/refresh");
-        isRefreshing = false;
-        processQueue();
-        return api(originalRequest);
-      } catch (refreshError) {
-        isRefreshing = false;
-        processQueue(refreshError as AxiosError);
-        useAuthStore.getState().clearUser();
-        window.location.href = "/login";
-        return Promise.reject(refreshError);
-      }
+    if (!refreshPromise) {
+      refreshPromise = api
+        .post("/auth/refresh", undefined, { skipAuthInterceptor: true })
+        .then(() => undefined)
+        .finally(() => {
+          refreshPromise = null;
+        });
     }
 
-    return Promise.reject(error);
+    try {
+      await refreshPromise;
+    } catch (refreshError) {
+      redirectToLogin();
+      return Promise.reject(refreshError);
+    }
+
+    return api(originalRequest);
   },
 );
 
