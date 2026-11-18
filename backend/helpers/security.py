@@ -1,7 +1,6 @@
 import jwt
 import uuid
 import bcrypt
-from typing import Optional
 from jwt.types import Options
 from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException, status, Response, Request
@@ -66,7 +65,7 @@ def hash_password(password: str) -> str:
     return hashed_bytes.decode('utf-8')
 
 
-def verify_password(plain_password: str, hashed_password: Optional[str] = None) -> bool:
+def verify_password(plain_password: str, hashed_password: str | None = None) -> bool:
     if not hashed_password:
         return False
 
@@ -75,7 +74,7 @@ def verify_password(plain_password: str, hashed_password: Optional[str] = None) 
     return bcrypt.checkpw(plain_bytes, hashed_bytes)
 
 
-def create_access_token(user_id: int, username: str, refresh_jti: str, current_time: Optional[datetime] = None) -> str:
+def create_access_token(user_id: int, username: str, refresh_jti: str, current_time: datetime | None = None) -> str:
     base_time = current_time or datetime.now(timezone.utc)
     
     access_payload = {
@@ -106,7 +105,7 @@ def create_tokens(user_id: int, username: str) -> tuple[str, str]:
     return access_token, refresh_token
 
 
-def decode_token(token: str, options: Optional[Options] = None) -> dict:
+def decode_token(token: str, options: Options | None = None) -> dict:
     try:
         payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM], options=options)
         return payload

@@ -1,9 +1,9 @@
 import logging
 import yfinance as yf
 from sqlalchemy import select
+from typing import Any, Union
 from async_lru import alru_cache
 from sqlalchemy.orm import joinedload
-from typing import Any, Union, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.models import Asset, Alert
 from .container import market_cache
@@ -18,7 +18,7 @@ class AssetService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_or_create_asset(self, symbol: str, name: Optional[str] = None) -> Asset:
+    async def get_or_create_asset(self, symbol: str, name: str | None = None) -> Asset:
         symbol = symbol.upper()
         result = await self.db.execute(select(Asset).where(Asset.symbol == symbol))
         asset = result.scalar_one_or_none()

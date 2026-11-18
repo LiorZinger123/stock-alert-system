@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 from sqlalchemy import update, case
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from db.models import Asset
@@ -17,7 +16,7 @@ class WorkerAssetService:
     async def bulk_update_prices(
         self,
         price_map: dict[str, float],
-        send_event: Optional[bool] = None
+        send_event: bool | None = None
     ) -> None:
         if not price_map:
             return

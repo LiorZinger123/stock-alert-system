@@ -2,7 +2,6 @@ import logging
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Cookie
 from core.database import get_db
-from services.container import auth_cache
 from services.auth_service import AuthService
 from services.user_service import UserService
 from api.schemas.auth import RegisterPayload, LoginCredentials, GoogleAuthRequest
@@ -16,7 +15,7 @@ logger = logging.getLogger(__name__)
 async def register(payload: RegisterPayload, response: Response, db: AsyncSession = Depends(get_db)) -> dict:
     try:
         user_service = UserService(db)
-        auth_service = AuthService(auth_cache, user_service)
+        auth_service = AuthService(user_service)
         
         new_user_id = await auth_service.register_user(payload, response)
         
@@ -38,7 +37,7 @@ async def register(payload: RegisterPayload, response: Response, db: AsyncSessio
 async def login(payload: LoginCredentials, response: Response, db: AsyncSession = Depends(get_db)) -> dict:
     try:
         user_service = UserService(db)
-        auth_service = AuthService(auth_cache, user_service)
+        auth_service = AuthService(user_service)
        
         user_id = await auth_service.login_user(payload, response)
 
@@ -60,7 +59,7 @@ async def login(payload: LoginCredentials, response: Response, db: AsyncSession 
 async def logout(response: Response, lior_refresh_token: str | None = Cookie(None)) -> dict[str, str]:
     try:
         if lior_refresh_token:
-            auth_service = AuthService(auth_cache)
+            auth_service = AuthService()
             await auth_service.logout_user(lior_refresh_token)
     except Exception as e:
         logger.error(f"Logout cleanup error (Redis): {e}")
@@ -78,7 +77,7 @@ async def refresh(response: Response,
         raise HTTPException(status_code=401, detail="Missing refresh token")
     
     try:
-        auth_service = AuthService(auth_cache)
+        auth_service = AuthService()
         
         return await auth_service.refresh_tokens(
             old_refresh_token=lior_refresh_token,
@@ -103,7 +102,7 @@ async def google_auth(
 ):
     try:
         user_service = UserService(db)
-        auth_service = AuthService(auth_cache, user_service)
+        auth_service = AuthService(user_service)
         
         user_id = await auth_service.authenticate_google_user(
             token=request.token,

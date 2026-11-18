@@ -2,11 +2,10 @@ import jwt
 import httpx
 import random
 import logging
-from typing import Optional
 from fastapi import HTTPException, status, Response
 from db.models import User
 from helpers.enums import UserProviders
-from services.cache_managers import AuthCache
+from services.container import auth_cache
 from services.user_service import UserService
 from api.schemas.auth import RegisterPayload, LoginCredentials
 from helpers.constants import TOKEN_COOKIES_EXPIRE_SECONDS, USED_TOKEN_TTL_SECONDS, GOOGLE_USER_AUTH
@@ -24,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 class AuthService:
-    def __init__(self, auth_cache: AuthCache, user_service: Optional[UserService] = None):
+    def __init__(self, user_service: UserService | None = None):
         self.auth_cache = auth_cache
         self.user_service = user_service
 

@@ -20,8 +20,7 @@ async def get_user_alerts(
     db: AsyncSession = Depends(get_db)
 ) -> list[AlertReadSchema]:
     try:
-        asset_service = AssetService(db)
-        alert_service = AlertService(db, asset_service)
+        alert_service = AlertService(db)
         return await alert_service.get_all_by_user(user_id, cursor_id, limit)
     except Exception as e:
         logger.error(f"Error fetching alerts: {e}")
@@ -64,8 +63,7 @@ async def update_alert(
     user_id: int = Depends(get_current_user_id)
 ) -> AlertReadSchema:
     try:
-        asset_service = AssetService(db)
-        alert_service = AlertService(db, asset_service)
+        alert_service = AlertService(db)
         return await alert_service.update_alert(user_id, alert_id, update_data)
     except HTTPException:
         raise
@@ -91,8 +89,7 @@ async def delete_alert(
         except ValueError:
             raise HTTPException(status_code=400, detail="Alert ID must be an integer.")
 
-        asset_service = AssetService(db)
-        alert_service = AlertService(db, asset_service)
+        alert_service = AlertService(db)
         await alert_service.delete_alert(user_id, alert_id_int)
         return {"message": "Successfully deleted alert"}
     except HTTPException:

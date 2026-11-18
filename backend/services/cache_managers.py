@@ -1,5 +1,5 @@
 import json
-from typing import Optional, Any
+from typing import Any
 from .redis_service import RedisService
 from helpers.constants import CACHE_TTL_PRICE
 
@@ -22,10 +22,10 @@ class MarketCache:
     def __init__(self, redis: RedisService):
         self.redis = redis
 
-    async def get_price(self, symbol: str) -> Optional[float]:
+    async def get_price(self, symbol: str) -> float | None:
         return await self.redis.read(f"stock:price:{symbol}")
 
-    async def get_prices(self, symbols: list[str]) -> dict[str, Optional[float]]:
+    async def get_prices(self, symbols: list[str]) -> dict[str, float | None]:
         cache_keys = [f"stock:price:{symbol}" for symbol in symbols]
         
         raw_values = await self.redis.mget(cache_keys)

@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class AlertService:
-    def __init__(self, db: AsyncSession, asset_service: AssetService):
+    def __init__(self, db: AsyncSession, asset_service: AssetService | None = None):
         self.db = db
         self.asset_service = asset_service
 
@@ -50,6 +50,9 @@ class AlertService:
         return [AlertReadSchema.model_validate(a) for a in alerts]
 
     async def create_new_alert(self, user_id: int, alert_data: AlertCreateSchema) -> AlertReadSchema:
+        if self.asset_service is None:
+            raise RuntimeError('AssetService is required for this operation')
+
         asset = await self.asset_service.get_or_create_asset(alert_data.symbol, alert_data.name)
 
         query = select(Alert).where(

@@ -1,15 +1,14 @@
-from typing import Optional
 from pydantic import BaseModel, ConfigDict
 from helpers.enums import AlertStatus, ConditionEnum
 
 
 class AssetSchema(BaseModel):
     symbol: str
-    name: Optional[str] = None
-    sector: Optional[str] = None
-    industry: Optional[str] = None
-    exchange: Optional[str] = None
-    price: Optional[float] = None
+    name: str | None = None
+    sector: str | None = None
+    industry: str | None = None
+    exchange: str | None = None
+    price: float | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -28,6 +27,6 @@ class AssetAlertPreview(BaseModel):
 
 
 class AssetDetails(AssetSchema):
-    user_alerts: Optional[list[AssetAlertPreview]] = None
+    user_alerts: list[AssetAlertPreview] | None = None
 
     model_config = ConfigDict(from_attributes=True)

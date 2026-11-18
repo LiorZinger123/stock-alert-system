@@ -1,4 +1,3 @@
-from typing import Optional
 from db.models import Alert
 from api.schemas.alerts import AlertStatus
 from .rabbitmq_publisher import RabbitMQPublisher
@@ -34,7 +33,7 @@ class NotificationService:
         user_id: int, 
         alert_id: int, 
         status: AlertStatus, 
-        price: Optional[float] = None
+        price: float | None = None
     ) -> None:
         alert_status_payload = {
             "type": QueueNotificationPayloadTypes.ALERT_STATUS.value,

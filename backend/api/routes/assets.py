@@ -44,11 +44,7 @@ async def get_asset_details(
 
 
 @router.get("/{symbol}/price")
-async def get_asset_price(
-    symbol: str,
-    db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_current_user_id)
-) -> dict:
+async def get_asset_price(symbol: str, db: AsyncSession = Depends(get_db)) -> dict:
     try:
         service = AssetService(db)
         price = await service.get_price_with_fallback(symbol)
